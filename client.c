@@ -1,17 +1,11 @@
 #include <stdio.h>
-
 #include <stdlib.h>
-
 #include <string.h>
-
 #include <sys/socket.h>
-
 #include <arpa/inet.h>
-
 #include <unistd.h>
 
 #define PORT 7070
-
 #define BUFFER_SIZE 1024
 
 void printMenu()
@@ -24,8 +18,7 @@ void printMenu()
 
 int main(int argc, char *argv[])
 {
-
-    int clientSocket, valRead;
+    int clientSocket;
     struct sockaddr_in serverAddress;
     char buffer[BUFFER_SIZE] = {0};
     char message[BUFFER_SIZE] = {0};
@@ -46,8 +39,8 @@ int main(int argc, char *argv[])
         perror("Invalid address/ Address not supported");
         exit(EXIT_FAILURE);
     }
-    // Connect to the server
 
+    // Connect to the server
     if (connect(clientSocket, (struct sockaddr *)&serverAddress, sizeof(serverAddress)) < 0)
     {
         perror("Connection failed");
@@ -55,23 +48,22 @@ int main(int argc, char *argv[])
     }
     printf("Connected to the server.\n");
 
-    int loggedIn = 0;
+    int authenticated = 0;
 
-    while (1)
+    while (!authenticated)
     {
-        printMenu();
 
         // Clear the buffer and message
         memset(buffer, 0, BUFFER_SIZE);
         memset(message, 0, BUFFER_SIZE);
 
+        printMenu();
         // Get user choice
         printf("Enter your choice: ");
         fgets(message, BUFFER_SIZE, stdin);
 
         // Send user choice to the server
         send(clientSocket, message, strlen(message), 0);
-
         // Process user choice
         switch (atoi(message))
         {
@@ -79,29 +71,38 @@ int main(int argc, char *argv[])
             // Get username and password from the user
             printf("Enter your username: ");
             fgets(message, BUFFER_SIZE, stdin);
+            message[strcspn(message, "\n")] = 0;
             send(clientSocket, message, strlen(message), 0);
 
             printf("Enter your password: ");
             fgets(message, BUFFER_SIZE, stdin);
+            message[strcspn(message, "\n")] = 0;
             send(clientSocket, message, strlen(message), 0);
 
-            loggedIn = 1;
-            break;
+            // Receive and print the server's response
+            recv(clientSocket, buffer, BUFFER_SIZE, 0);
+            printf("Server: %s", buffer);
 
+            recv(clientSocket, buffer, BUFFER_SIZE, 0);
+            authenticated = atoi(buffer);
+            break;
         case 2: // Sign Up
             // Get username and password from the user
             printf("Enter your new username: ");
             fgets(message, BUFFER_SIZE, stdin);
+            message[strcspn(message, "\n")] = 0;
             send(clientSocket, message, strlen(message), 0);
 
             printf("Enter your new password: ");
             fgets(message, BUFFER_SIZE, stdin);
+            message[strcspn(message, "\n")] = 0;
             send(clientSocket, message, strlen(message), 0);
 
+            // Receive and print the server's response
             recv(clientSocket, buffer, BUFFER_SIZE, 0);
             printf("Server: %s", buffer);
 
-            loggedIn = 1;
+            authenticated = 1;
             break;
 
         case 3: // Exit
@@ -109,11 +110,13 @@ int main(int argc, char *argv[])
             exit(0);
 
         default:
-            printf("Invalid choice. Please try again.\n");
+            printf("Invalid choice from client. Please try again.\n");
+            recv(clientSocket, buffer, BUFFER_SIZE, 0);
+            break;
         }
 
         // Break out of the loop if the user successfully logs in or signs up
-        if (loggedIn)
+        if (authenticated)
         {
             break;
         }
@@ -141,14 +144,6 @@ int main(int argc, char *argv[])
         // Read message from server
         recv(clientSocket, buffer, BUFFER_SIZE, 0);
         printf("Server: %s\n", buffer);
-
-        // Check for server exit command
-        if (strcmp(buffer, "Authentication failed. Try again.\n") == 0)
-        {
-            printf("Enter your username and password (e.g., 'login username password'):\n");
-            fgets(message, BUFFER_SIZE, stdin);
-            send(clientSocket, message, strlen(message), 0);
-        }
     }
 
     // Close socket
