@@ -33,8 +33,8 @@ void main(){
     removeUserFromRoom(rooms,0,"ngoc");
     printRooms(rooms);
     
-    // char* result1 = roomToString(rooms, 0);
-    // char* result2 = roomToString(rooms, 2);
-    // printf("\n<%s>\n", result1);
-    // printf("\n<%s>\n", result2);
+    char* result1 = roomToString(rooms, 0);
+    char* result2 = roomToString(rooms, 2);
+    printf("\n<%s>\n", result1);
+    printf("\n<%s>\n", result2);
 }
