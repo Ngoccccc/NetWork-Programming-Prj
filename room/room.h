@@ -5,41 +5,45 @@
 #define MAX_ROOM_ALLOWED 5
 
 // Room status
-typedef enum {
+typedef enum
+{
     WAITING,
     PLAYING
 } RoomStatus;
 
 // Room struct
-typedef struct Room{
+typedef struct Room
+{
     int room_id;
-    char* players[4];
+    char *players[4];
+    int point[2];
     int inroom_no;
+    int isEndGame[2];
     RoomStatus status;
 } Room;
 
 // Room util
 
-int addRoom(Room** rooms, int room_id, char* owner);
+int addRoom(Room **rooms, int room_id, char *owner);
 
-Room* createRoom(int room_id, char* owner);
+Room *createRoom(int room_id, char *owner);
 
-Room* createBlankRoom(int room_id);
+Room *createBlankRoom(int room_id);
 
-int addUserToRoom(Room** rooms, int room_id, char* username);
+int addUserToRoom(Room **rooms, int room_id, char *username);
 
-int removeUserFromRoom(Room** rooms, int room_id, char* username);
+int removeUserFromRoom(Room **rooms, int room_id, char *username);
 
-void delRoom(Room** rooms, int room_id);
+void delRoom(Room **rooms, int room_id);
 
 // void startGame(Room** rooms, int room_id);
 
-void printRooms(Room** rooms);
+void printRooms(Room **rooms);
 
-void printRoom(Room* room, char* current_user_name);
+void printRoom(Room *room, char *current_user_name);
 
-void freeRoom(Room* node);
+void freeRoom(Room *node);
 
-char* roomToString(Room** root, int room_id);
+char *roomToString(Room **root, int room_id);
 
 #endif
