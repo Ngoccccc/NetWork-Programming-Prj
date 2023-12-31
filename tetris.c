@@ -21,6 +21,7 @@ char *name;
 int sock = 0, valread;
 // set flags to default values
 int level, score, showtext = 1, next, shownext = 1, end, clrlines = 0;
+int randomNum = 1010011010012;
 int startlevel, dropped = 0;
 int fixedpoint[2] = {0};
 // screen is divided into three sections - left, right and center
@@ -262,8 +263,9 @@ void initpiece()
        // initializes a new piece
        checkclr();
        int current;
+       randomNum = randomNum / 7;
        current = next;
-       next = rand() % 7;
+       next = randomNum % 7;
        switch (current)
        {
        case 0:
@@ -1604,7 +1606,7 @@ int main(void)
        scanw("%13s ", name);
        noecho();
        curs_set(0);
-       next = rand() % 7;
+       next = randomNum % 7;
        while (!game())
               ;
        free(name);
