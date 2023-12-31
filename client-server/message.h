@@ -2,7 +2,7 @@
 #define __MESSAGE_H_
 
 #define SEND_RECV_LEN 100
-#define BUFFSIZE 100
+#define BUFFSIZE 128
 #define MSG_NUM 30
 
 #define LOGINS "LOGINS" // [from SERVER] require: client(s) to login
