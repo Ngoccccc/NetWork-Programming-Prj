@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "../client-server/message.h"
+
 #include "room.h"
 
 Room* createRoom(int room_id, char* owner){
@@ -22,11 +24,13 @@ Room* createBlankRoom(int room_id){
     return newroom;
 }
 
-int addRoom(Room** root, int room_id, char* owner){
-        if(root[room_id] == NULL){
-            root[room_id] = createRoom(room_id, owner);
-            return room_id;
+int addRoom(Room** root, char* owner){
+    for(int i = 0; i < MAX_ROOM_ALLOWED; i++){
+        if(root[i] == NULL){
+            root[i] = createRoom(i, owner);
+            return i;
         }
+    }
     return -1;
 }
 
@@ -86,7 +90,8 @@ void printRooms(Room** rooms){
 }
 
 void printRoom(Room* room, char* current_user_name){
-    printf("\n------------------Phong choi %d ------------------\n", room->room_id + 1);
+    printf("\n------------------Phong choi %d ------------------\n", room->room_id);
+    printf("%p\n", room);
     printf("- Trang thai: ");
     switch(room->status){
         case WAITING: printf("dang cho tran dau\n"); break;
@@ -95,9 +100,7 @@ void printRoom(Room* room, char* current_user_name){
     printf("- So nguoi choi hien tai: %d\n", room->inroom_no);
     printf("- Nguoi choi:");
     printf("\n\t1. %s (chu phong)", room->players[0]);
-    for(int j = 1; j < room->inroom_no; j++){
-        printf("\n\t%d. %s", j+1, room->players[j]);
-    }
+    
     if(current_user_name != NULL){
         if(strcmp(current_user_name, room->players[0]) == 0){
             printf("\n1. Bat dau van dau");
@@ -105,14 +108,13 @@ void printRoom(Room* room, char* current_user_name){
         } else {
             printf("\n2. Thoat phong\nLua chon cua ban: ");
         }
-        printf("/n");
     }
 }
 
 char* roomToString(Room** root, int room_id){
     Room* room = root[room_id];
     char* str = (char*) malloc(100);
-    snprintf(str, sizeof(str), "room:%d", room->room_id + 1);
+    snprintf(str, sizeof(str), "%d-%d", room->room_id, room->inroom_no);
     for(int i = 0; i < room->inroom_no; i++){
         strcat(str, "-");
         strcat(str, room->players[i]);

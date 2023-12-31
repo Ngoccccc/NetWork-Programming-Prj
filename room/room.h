@@ -20,7 +20,7 @@ typedef struct Room{
 
 // Room util
 
-int addRoom(Room** rooms, int room_id, char* owner);
+int addRoom(Room** rooms, char* owner);
 
 Room* createRoom(int room_id, char* owner);
 
