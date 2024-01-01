@@ -6,10 +6,11 @@
 
 #include "room.h"
 
-Room* createRoom(int room_id, char* owner){
+Room* createRoom(int room_id, char* owner, int level){
     Room* newroom = createBlankRoom(room_id);
     newroom->status = WAITING;
     newroom->inroom_no = 1;
+    newroom->room_level = level;
     strcpy(newroom->players[0], owner);
     return newroom;
 }
@@ -24,10 +25,10 @@ Room* createBlankRoom(int room_id){
     return newroom;
 }
 
-int addRoom(Room** root, char* owner){
+int addRoom(Room** root, char* owner, int level){
     for(int i = 0; i < MAX_ROOM_ALLOWED; i++){
         if(root[i] == NULL){
-            root[i] = createRoom(i, owner);
+            root[i] = createRoom(i, owner, level);
             return i;
         }
     }
@@ -67,7 +68,10 @@ int removeUserFromRoom(Room** root, int room_id, char* username){
 }
 
 void freeRoom(Room* node){
-    for(int i = 0; i < MAX_PLAYER_PER_ROOM; i++){
+    // for(int i = 0; i < MAX_PLAYER_PER_ROOM; i++){
+    //     free(node->players[i]);
+    // }
+    for(int i = 0; i < node->inroom_no; i++){
         free(node->players[i]);
     }
     free(node);
@@ -91,7 +95,8 @@ void printRooms(Room** rooms){
 
 void printRoom(Room* room, char* current_user_name){
     printf("\n------------------Phong choi %d ------------------\n", room->room_id);
-    printf("%p\n", room);
+    // printf("%p\n", room);
+    printf("Cap do phong choi: %d\n", room->room_level);
     printf("- Trang thai: ");
     switch(room->status){
         case WAITING: printf("dang cho tran dau\n"); break;
@@ -101,20 +106,26 @@ void printRoom(Room* room, char* current_user_name){
     printf("- Nguoi choi:");
     printf("\n\t1. %s (chu phong)", room->players[0]);
     
+    for(int j = 1; j < room->inroom_no; j++){
+        printf("\n\t%d. %s", j+1, room->players[j]);
+    }
+
     if(current_user_name != NULL){
         if(strcmp(current_user_name, room->players[0]) == 0){
             printf("\n1. Bat dau van dau");
-            printf("\n2. Thoat phong\nLua chon cua ban: ");
+            printf("\n2. Thoat phong");
+            printf("\nLua chon cua ban: ");
         } else {
-            printf("\n2. Thoat phong\nLua chon cua ban: ");
+            printf("\n2. Thoat phong");
+            printf("\nLua chon cua ban: ");
         }
     }
 }
 
 char* roomToString(Room** root, int room_id){
     Room* room = root[room_id];
-    char* str = (char*) malloc(100);
-    snprintf(str, sizeof(str), "%d-%d", room->room_id, room->inroom_no);
+    char* str = (char*) malloc(BUFFSIZE);
+    snprintf(str, BUFFSIZE, "%d-%d", room->room_id, room->inroom_no);
     for(int i = 0; i < room->inroom_no; i++){
         strcat(str, "-");
         strcat(str, room->players[i]);

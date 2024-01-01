@@ -50,7 +50,7 @@ int requestSignup(int sock){
     while(state == NOT_LOGGED_IN || state == WAITING_RESPONSE){
         if(state == NOT_LOGGED_IN){
             while(1){
-                system("clear");
+                // system("clear");
                 printf("\n----Dang ki----");
                 printf("\n> Ten nguoi dung (go 'quit' de thoat): "); scanf("%s", username);
                 if(strcmp(username, "quit") == 0)
