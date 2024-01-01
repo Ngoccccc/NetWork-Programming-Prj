@@ -29,6 +29,7 @@ int client_send;
 int roll_control = 1;
 int af_roll = 1;
 int in_room = 1;
+int level = 1;
 Room* my_room = NULL;
 
 //----------User Interfaces------------
@@ -104,7 +105,7 @@ int main(int argc, const char * argv[]) {
 void home(int sock){
     int choice;
     do {
-        system("clear");
+        // system("clear");
         printf("\n-----------Sanh cho-----------");
         printf("\nXin chao %s", current_user->username);
         printf("\n1. Tao phong");
@@ -112,8 +113,11 @@ void home(int sock){
         printf("\n3. Thoat");
         printf("\nLua chon cua ban: "); scanf("%d%*c", &choice);
         switch(choice){
-            case 1: 
-                requestCreateRoom(sock);
+            case 1:
+                
+                printf("Nhap level cua phong: ");
+                scanf("%d%*c", &level); 
+                requestCreateRoom(sock, level);
                 roomLobby(sock);
                 while(in_room){}
                 break;
@@ -144,7 +148,11 @@ void roomLobby(int sock){
                         in_room = 1;
                         while(af_roll){}
                         break;
-                    case 2: exitRoom(sock); in_room = 0; break;
+                    case 2:
+                        printf("exit\n"); 
+                        exitRoom(sock); 
+                        in_room = 0; 
+                        break;
                     default: printf("\nKhong ro cau lenh.\n"); break;
                 }
                 if(choice == 2 || state == IN_GAME) break;
@@ -259,8 +267,8 @@ void* recv_handler(void* recv_sock){
         if(strcmp(msg[0], "NEWROOM") == 0){
             if(strcmp(msg[1], "SUCCESS") == 0){
                 room_updating = 1;
-                system("clear");
-                my_room = createRoom(atoi(msg[2]), current_user->username);
+                // system("clear");
+                my_room = createRoom(atoi(msg[2]), current_user->username, atoi(msg[3]));
                 printRoom(my_room, current_user->username);
                 state = IN_ROOM;
                 room_updating = 0;
@@ -269,7 +277,7 @@ void* recv_handler(void* recv_sock){
         }
         if(strcmp(msg[0], "UPDATEROOM") == 0){
             if(strcmp(msg[1], "JOIN") == 0){
-                system("clear");
+                // system("clear");
                 strcpy(my_room->players[my_room->inroom_no], msg[2]);
                 my_room->inroom_no += 1;
                 room_updating = 1;
@@ -279,7 +287,7 @@ void* recv_handler(void* recv_sock){
                 continue;
             }
             if(strcmp(msg[1], "ALLEXIT") == 0){
-                system("clear");
+                // system("clear");
                 printf("\nChu phong %s roi phong. Phong choi giai tan !\nNhan '1' de quay lai trang chu: \n", msg[2]);
                 Room* room = my_room;
                 freeRoom(room);
@@ -297,7 +305,7 @@ void* recv_handler(void* recv_sock){
                 }
                 my_room->inroom_no -= 1;
                 room_updating = 1;
-                system("clear");
+                // system("clear");
                 printf("\n%s left\n", msg[2]);
                 printRoom(my_room, current_user->username);
                 room_updating = 0;
@@ -367,7 +375,7 @@ void* recv_handler(void* recv_sock){
         //     continue;
         // }
         if(strcmp(msg[0], "ROOMS") == 0){
-            system("clear");
+            // system("clear");
             printf("\n%-62s", "=====================Danh sach cac phong=====================");
             printf("\n%-5s|%-20s|%s", "ID", "Chu phong", "So nguoi choi");
             int room_no = atoi(msg[1]);

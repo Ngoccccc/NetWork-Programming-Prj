@@ -15,26 +15,26 @@ Room* createJoinRoom(char** msg){
     int room_id = atoi(msg[2]);
     int inroom_no = atoi(msg[3]);
 
-    Room* joinroom = (Room*) malloc(sizeof(Room));
+    Room* joinroom = (Room*) malloc(BUFFSIZE);
     // joinroom->game = NULL;
     joinroom->inroom_no = inroom_no;
     joinroom->room_id = room_id;
     joinroom->status = WAITING;
     int i = 0;
     for(; i < inroom_no; i++){
-        joinroom->players[i] = (char*) malloc(100);
+        joinroom->players[i] = (char*) malloc(30);
         strcpy(joinroom->players[i], msg[i+4]);
     }
     // for(; i < MAX_PLAYER_PER_ROOM; i++){
-    //     joinroom->players[i] = (char*) malloc(100);
+    //     joinroom->players[i] = (char*) malloc(10);
     // }
     // printf("ss %d", joinroom->inroom_no);
     return joinroom;
 }
 
-void requestCreateRoom(int sock){
+void requestCreateRoom(int sock, int level){
     char buff[BUFFSIZE];
-    sprintf(buff, "NEWROOM-%s", current_user->username);
+    sprintf(buff, "NEWROOM-%s-%d", current_user->username, level);
     send(sock, buff, SEND_RECV_LEN, 0);
     state = WAITING_RESPONSE;
 }
@@ -63,10 +63,12 @@ int requestJoinRoom(int sock){
 }
 
 void exitRoom(int sock){
+    printf("1\n");
     char buff[BUFFSIZE];
     snprintf(buff, sizeof(buff), "EXITROOM-%s-%d", current_user->username, my_room->room_id); // message
     send(sock, buff, SEND_RECV_LEN, 0);
     Room* node = my_room;
+    printf("2\n");
     freeRoom(node);
     state = LOGGED_IN;
     my_room = NULL;

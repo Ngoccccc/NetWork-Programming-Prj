@@ -8,7 +8,7 @@ extern Room* my_room;
 
 //-------Functions-----------
 
-void requestCreateRoom(int sock);
+void requestCreateRoom(int sock, int level);
 
 int requestJoinRoom();
 

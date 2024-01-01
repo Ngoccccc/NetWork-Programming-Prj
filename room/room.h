@@ -15,14 +15,15 @@ typedef struct Room{
     int room_id;
     char* players[4];
     int inroom_no;
+    int room_level;
     RoomStatus status;
 } Room;
 
 // Room util
 
-int addRoom(Room** rooms, char* owner);
+int addRoom(Room** rooms, char* owner, int level);
 
-Room* createRoom(int room_id, char* owner);
+Room* createRoom(int room_id, char* owner, int level);
 
 Room* createBlankRoom(int room_id);
 
