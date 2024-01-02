@@ -356,21 +356,13 @@ void* recv_handler(void* recv_sock){
         //     state = IN_GAME;
         //     continue;
         // }
-        // if(strcmp(msg[0], "ROLL") == 0){
-        //     game_state = 1;
-        //     state = IN_GAME;
-        //     printf("\nDen luot ban !!\n");
-        //     printf("Moi nhap 1\n");
-        //     af_roll = 0;
-        //     roll_control = 1;
-        //     continue;
-        // }
         
         // if(strcmp(msg[0], WIN) == 0){
         //     printf("Nguoi choi %s da chien thang !!",my_room->players[atoi(msg[1])]);
         //     printf("\n");
         //     continue;
         // }
+        
         // if(strcmp(msg[0], ENDGAME) == 0){
         //     printf("Tro choi ket thuc !!");
         //     printf("\n");
@@ -382,10 +374,10 @@ void* recv_handler(void* recv_sock){
         if(strcmp(msg[0], "ROOMS") == 0){
             // system("clear");
             printf("\n%-62s", "=====================Danh sach cac phong=====================");
-            printf("\n%-5s|%-20s|%s", "ID", "Chu phong", "So nguoi choi");
+            printf("\n%5s|%20s|%14s|%17s|", "ID", "Chu phong", "So nguoi choi", "Cap do cua phong");
             int room_no = atoi(msg[1]);
             for(int i = 0; i < room_no; i++){
-                printf("\n%-5s|%-20s|%s/4", msg[2+3*i], msg[3+3*i], msg[4+3*i]);
+                printf("\n%5s|%20s|%12s/4|%17s|", msg[2+4*i], msg[3+4*i], msg[4+4*i], msg[5+4*i]);
             }
             printf("\n=============================================================");
             state = LOGGED_IN;

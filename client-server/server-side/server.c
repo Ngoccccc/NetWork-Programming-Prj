@@ -248,7 +248,7 @@ void *connection_handler(void *client_sockets){
 			sprintf(buff, "ROOMS-%d", current_no_room);
 			for(int i = 0; i < MAX_ROOM_ALLOWED; i++){
 				if(rooms[i] == NULL) continue;
-				sprintf(buff1, "-%d-%s-%d", i, rooms[i]->players[0], rooms[i]->inroom_no);
+				sprintf(buff1, "-%d-%s-%d-%d", i, rooms[i]->players[0], rooms[i]->inroom_no, rooms[i]->room_level);
 				strcat(buff, buff1);
 			}
 			printf("\n> Send: %s", buff);

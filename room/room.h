@@ -15,6 +15,8 @@ typedef struct Room{
     int room_id;
     char* players[4];
     int inroom_no;
+    int points[2];
+    int isEndGame[2];
     int room_level;
     RoomStatus status;
 } Room;
