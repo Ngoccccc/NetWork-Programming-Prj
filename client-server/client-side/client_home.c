@@ -14,11 +14,13 @@
 Room* createJoinRoom(char** msg){
     int room_id = atoi(msg[2]);
     int inroom_no = atoi(msg[3]);
+    int room_level = atoi(msg[4]);
 
     Room* joinroom = (Room*) malloc(BUFFSIZE);
     // joinroom->game = NULL;
     joinroom->inroom_no = inroom_no;
     joinroom->room_id = room_id;
+    joinroom->room_level = room_level;
     joinroom->status = WAITING;
     int i = 0;
     for(; i < inroom_no; i++){

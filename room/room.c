@@ -124,7 +124,7 @@ void printRoom(Room* room, char* current_user_name){
 char* roomToString(Room** root, int room_id){
     Room* room = root[room_id];
     char* str = (char*) malloc(BUFFSIZE);
-    snprintf(str, BUFFSIZE, "%d-%d", room->room_id, room->inroom_no);
+    snprintf(str, BUFFSIZE, "%d-%d-%d", room->room_id, room->inroom_no, room->room_level);
     for(int i = 0; i < room->inroom_no; i++){
         strcat(str, "-");
         strcat(str, room->players[i]);
