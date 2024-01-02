@@ -19,8 +19,6 @@ typedef struct Room
     int point[2];
     int isEndGame[2];
     int inroom_no;
-    int points[2];
-    int isEndGame[2];
     int room_level;
     RoomStatus status;
 } Room;
