@@ -1,35 +1,15 @@
-#
-CC=gcc
-
-CFLAGS=-Wall -pedantic -g
-
-INCLUDES=
-
-LFLAGS=
-
 LIBS=-lncurses
 
-SRCS=tetris.c
+all: test
 
-OBJS=$(SRCS:.c=.o)
+test: test.o tetris.o
+	gcc test.o tetris.o -o test $(LIBS)
 
-NAME=tetris
+tetris.o: tetris.c
+	gcc -c -Wall tetris.c
 
-.PHONY: depend clean
-
-all: $(NAME)
-	@echo  $(NAME) has been compiled.
-
-$(NAME): $(OBJS)
-	$(CC) $(CFLAGS) $(INCLUDES) -o $(NAME) $(OBJS) $(LFLAGS) $(LIBS)
-
-.c.o:
-	$(CC) $(CFLAGS) $(INCLUDES) -c $<  -o $@
+test.o: test.c
+	gcc -c -Wall test.c
 
 clean:
-	$(RM) *.o *~ $(NAME)
-
-depend: $(SRCS)
-	makedepend $(INCLUDES) $^
-
-#
+	rm -f *.o *~

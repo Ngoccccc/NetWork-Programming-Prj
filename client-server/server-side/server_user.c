@@ -8,20 +8,24 @@
 #include "../../user/user.h"
 #include "server_user.h"
 
-UserNode* users;
+extern UserNode *users;
 
-UserNode* login(char** msg, int client_send_sock, int client_recv_sock) {
+UserNode *login(char **msg, int client_send_sock, int client_recv_sock)
+{
 	char buff[BUFFSIZE];
-	UserNode* node = searchUser(users, msg[1]);
-	if(node == NULL){
+	UserNode *node = searchUser(users, msg[1]);
+	if (node == NULL)
+	{
 		send(client_recv_sock, "LOGIN-FAILED-NONEXIST", SEND_RECV_LEN, 0); // message
 		return NULL;
 	}
-	if(node->status != OFFLINE){
+	if (node->status != OFFLINE)
+	{
 		send(client_recv_sock, "LOGIN-FAILED-ACTIVE", SEND_RECV_LEN, 0); // message
 		return NULL;
 	}
-	if(strcmp(node->password, msg[2]) != 0){
+	if (strcmp(node->password, msg[2]) != 0)
+	{
 		send(client_recv_sock, "LOGIN-FAILED-WRONGPASS", SEND_RECV_LEN, 0);
 		return NULL;
 	}
@@ -34,17 +38,21 @@ UserNode* login(char** msg, int client_send_sock, int client_recv_sock) {
 	return node;
 }
 
-void logout(char** msg, UserNode** current_user){
-	if(updateUserStatus(users, msg[1], OFFLINE)){
+void logout(char **msg, UserNode **current_user)
+{
+	if (updateUserStatus(users, msg[1], OFFLINE))
+	{
 		send((*current_user)->recv_sock, "LOGOUT-SUCCESS", SEND_RECV_LEN, 0); // message
 		*current_user = NULL;
 	}
 }
 
-void signup(char** msg, UserNode** current_user, int client_send_sock, int client_recv_sock){
+void signup(char **msg, UserNode **current_user, int client_send_sock, int client_recv_sock)
+{
 	// add to users tree
-	UserNode* node = searchUser(users, msg[1]);
-	if(node != NULL){
+	UserNode *node = searchUser(users, msg[1]);
+	if (node != NULL)
+	{
 		send((*current_user)->recv_sock, "SIGNUP-EXISTS", SEND_RECV_LEN, 0);
 		return;
 	}
@@ -57,17 +65,18 @@ void signup(char** msg, UserNode** current_user, int client_send_sock, int clien
 	(*current_user)->send_sock = client_send_sock;
 
 	// write new account to users file
-	FILE* fp = fopen(ACCOUNTS_PATH, "r+");
-	if(fp == NULL){
+	FILE *fp = fopen(ACCOUNTS_PATH, "r+");
+	if (fp == NULL)
+	{
 		printf("Can't open users records");
 		send((*current_user)->recv_sock, "SIGNUP-FAIL", SEND_RECV_LEN, 0);
 		return;
 	}
-	fprintf(fp, "%d", total_user+1);
+	fprintf(fp, "%d", total_user + 1);
 	fseek(fp, 0, SEEK_END);
 	fprintf(fp, "%s %s\n", msg[1], msg[2]);
 	fclose(fp);
-	
+
 	printf("\nUser signed up: %s\n", (*current_user)->username);
 	// send sign up ACK
 	char buff[BUFFSIZE];
