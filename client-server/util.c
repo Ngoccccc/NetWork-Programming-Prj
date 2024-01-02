@@ -23,12 +23,3 @@ int meltMsg(char* msg, char* result[]){
     return ele_count;
 }
 
-// int main(){
-//     char* result[10];
-//     int ele_count = meltMsg("01#20#4#3#longkkr#tuanvu#ngocprof", result);
-//     printf("\n%d", ele_count);
-//     for(int i = 0; i < ele_count; i++){
-//         printf("\n%s", result[i]);
-//     }
-//     printf("\n");
-// }

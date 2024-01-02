@@ -79,15 +79,15 @@ int main(int argc, const char * argv[]) {
     // Threading
     pthread_t threads[2];
 
-    if(pthread_create(&threads[0], NULL, send_handler, &client_send_sock) < 0){
+    if(pthread_create(&threads[0], NULL, recv_handler, &client_recv_sock) < 0){
+        puts("Unable to open recv thread. Exit");
+        exit(-1);
+    }
+    if(pthread_create(&threads[1], NULL, send_handler, &client_send_sock) < 0){
         puts("Unable to open send thread. Exit.");
         exit(-1);
     }
 
-    if(pthread_create(&threads[1], NULL, recv_handler, &client_recv_sock) < 0){
-        puts("Unable to open recv thread. Exit");
-        exit(-1);
-    }
 
     // join threads
     pthread_join(threads[0], NULL);
@@ -111,7 +111,9 @@ void home(int sock){
         printf("\n1. Tao phong");
         printf("\n2. Tham gia phong");
         printf("\n3. Thoat");
-        printf("\nLua chon cua ban: "); scanf("%d%*c", &choice);
+        printf("\nLua chon cua ban: "); 
+        scanf("%d%*c", &choice);
+        fflush(stdout);
         switch(choice){
             case 1:
                 
@@ -127,7 +129,9 @@ void home(int sock){
                     while(in_room){}
                 }
                 break;
-            case 3: requestLogout(sock); break;
+            case 3: 
+                requestLogout(sock);
+                break;
             default: printf("\nLa sao? Nhap lai coi\n"); break;
         }
     } while(choice != 3);
@@ -149,7 +153,7 @@ void roomLobby(int sock){
                         while(af_roll){}
                         break;
                     case 2:
-                        printf("exit\n"); 
+                        // printf("exit\n"); 
                         exitRoom(sock); 
                         in_room = 0; 
                         break;
@@ -190,7 +194,7 @@ void* send_handler(void* send_sock){
             printf("\n1. Dang nhap");
             printf("\n2. Dang ki");
             printf("\n3. Thoat");
-            printf("\nLua chon cua ban: "); scanf("%d", &choice);
+            printf("\nLua chon cua ban: "); scanf("%d%*c", &choice);
             switch(choice){
                 case 1:
                     if(requestLogin(send_socket)){
@@ -221,6 +225,7 @@ void* recv_handler(void* recv_sock){
     char buff[BUFFSIZE];
     char* msg[MSG_NUM];
     while((recv_bytes = recv(recv_socket, buff, SEND_RECV_LEN, 0) > 0)){
+        // printf("\n> Recv: %s", buff);
         meltMsg(buff, msg);
         if(strcmp(msg[0], "LOGIN") == 0){
             if(strcmp(msg[1], "SUCCESS") == 0){

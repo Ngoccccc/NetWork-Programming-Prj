@@ -16,7 +16,7 @@
 #include "../message.h"
 #include "server.h"
 
-
+pthread_mutex_t stdout_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 //------------------Globals----------------------
 
@@ -53,7 +53,8 @@ int main(int argc, const char* args[])
     if (server_socket==-1){
 		perror("Socket initialization failed");
 		exit(EXIT_FAILURE);
-	} else printf("Server socket created successfully\n");
+	} 
+	else printf("Server socket created successfully\n");
 
 	int option = 1;
 	setsockopt(server_socket, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
@@ -67,13 +68,15 @@ int main(int argc, const char* args[])
 		printf("socket bind failed...\n"); 
         exit(0);
 	}
-    else printf("Socket successfully binded..\n"); 
+    else 
+		printf("Socket successfully binded..\n"); 
     
     if (listen(server_socket, 3)!=0){
 		printf("Listen failed...\n"); 
         exit(0); 
     } 
-    else printf("Server listening..\n");
+    else 
+		printf("Server listening..\n");
 
 	// --------- Handling connection from clients -----------
 
@@ -91,13 +94,15 @@ int main(int argc, const char* args[])
 		if(client_send_sock < 0){
 			printf("Server failed to accept client's send-stream\n");
 			exit(0);
-		} else puts("> Client's send-sock accepted");
+		} else 
+			puts("> Client's send-sock accepted");
 
 		client_recv_sock = accept(server_socket, (struct sockaddr *)&client_addr, &sin_size);
 		if(client_recv_sock < 0){
 			printf("Server failed to accept client's recv-stream\n");
 			exit(0);
-		} else puts("> Client's recv-sock accepted");
+		}else 
+			puts("> Client's recv-sock accepted");
 		puts("Connection accepted");
 
 		ThrdHandlerArgs args;
@@ -182,6 +187,7 @@ void *connection_handler(void *client_sockets){
 			continue;
 		}
 		if(strcmp(msg[0], "NEWROOM") == 0){ // message prefix
+			// printf("new rôm");
 			userCreateRoom(msg, &current_user);
 			continue;
 		}
@@ -250,7 +256,9 @@ void *connection_handler(void *client_sockets){
 			continue;
 		} else {
 			send(client_recv_sock, "UNKNOWN", SEND_RECV_LEN, 0); // message
+			continue;
 		}
+		pthread_mutex_unlock(&stdout_mutex);
 	}
 
 	close(client_send_sock);
