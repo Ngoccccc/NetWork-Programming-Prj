@@ -31,6 +31,8 @@ int addRoom(Room** root, char* owner, int level){
             root[i] = createRoom(i, owner, level);
             return i;
         }
+        printf("%d\n", i);
+
     }
     return -1;
 }
@@ -109,15 +111,12 @@ void printRoom(Room* room, char* current_user_name){
     for(int j = 1; j < room->inroom_no; j++){
         printf("\n\t%d. %s", j+1, room->players[j]);
     }
-
+    fflush(stdout);
     if(current_user_name != NULL){
         if(strcmp(current_user_name, room->players[0]) == 0){
-            printf("\n1. Bat dau van dau");
-            printf("\n2. Thoat phong");
-            printf("\nLua chon cua ban: ");
+            printf("\n1. Bat dau van dau\n2. Thoat phong \nLua chon cua ban: ");
         } else {
-            printf("\n2. Thoat phong");
-            printf("\nLua chon cua ban: ");
+            printf("\n2. Thoat phong\nLua chon cua ban: ");
         }
     }
 }

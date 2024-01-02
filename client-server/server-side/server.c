@@ -15,6 +15,8 @@
 #include "../message.h"
 #include "server.h"
 
+pthread_mutex_t stdout_mutex = PTHREAD_MUTEX_INITIALIZER;
+
 //------------------Globals----------------------
 
 int current_no_room; // current number of room on server
@@ -51,9 +53,8 @@ int main(int argc, const char *args[])
 	{
 		perror("Socket initialization failed");
 		exit(EXIT_FAILURE);
-	}
-	else
-		printf("Server socket created successfully\n");
+	} 
+	else printf("Server socket created successfully\n");
 
 	int option = 1;
 	setsockopt(server_socket, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
@@ -68,15 +69,14 @@ int main(int argc, const char *args[])
 		printf("socket bind failed...\n");
 		exit(0);
 	}
-	else
-		printf("Socket successfully binded..\n");
-
-	if (listen(server_socket, 3) != 0)
-	{
-		printf("Listen failed...\n");
-		exit(0);
-	}
-	else
+    else 
+		printf("Socket successfully binded..\n"); 
+    
+    if (listen(server_socket, 3)!=0){
+		printf("Listen failed...\n"); 
+        exit(0); 
+    } 
+    else 
 		printf("Server listening..\n");
 
 	// --------- Handling connection from clients -----------
@@ -97,8 +97,7 @@ int main(int argc, const char *args[])
 		{
 			printf("Server failed to accept client's send-stream\n");
 			exit(0);
-		}
-		else
+		} else 
 			puts("> Client's send-sock accepted");
 
 		client_recv_sock = accept(server_socket, (struct sockaddr *)&client_addr, &sin_size);
@@ -106,8 +105,7 @@ int main(int argc, const char *args[])
 		{
 			printf("Server failed to accept client's recv-stream\n");
 			exit(0);
-		}
-		else
+		}else 
 			puts("> Client's recv-sock accepted");
 		puts("Connection accepted");
 
@@ -203,8 +201,8 @@ void *connection_handler(void *client_sockets)
 			logout(msg, &current_user);
 			continue;
 		}
-		if (strcmp(msg[0], "NEWROOM") == 0)
-		{ // message prefix
+		if(strcmp(msg[0], "NEWROOM") == 0){ // message prefix
+			// printf("new rôm");
 			userCreateRoom(msg, &current_user);
 			continue;
 		}
@@ -272,11 +270,9 @@ void *connection_handler(void *client_sockets)
 			char buff[BUFFSIZE];
 			char buff1[BUFFSIZE];
 			sprintf(buff, "ROOMS-%d", current_no_room);
-			for (int i = 0; i < MAX_ROOM_ALLOWED; i++)
-			{
-				if (rooms[i] == NULL)
-					continue;
-				sprintf(buff1, "-%d-%s-%d", i, rooms[i]->players[0], rooms[i]->inroom_no);
+			for(int i = 0; i < MAX_ROOM_ALLOWED; i++){
+				if(rooms[i] == NULL) continue;
+				sprintf(buff1, "-%d-%s-%d-%d", i, rooms[i]->players[0], rooms[i]->inroom_no, rooms[i]->room_level);
 				strcat(buff, buff1);
 			}
 			printf("\n> Send: %s", buff);
@@ -286,7 +282,9 @@ void *connection_handler(void *client_sockets)
 		else
 		{
 			send(client_recv_sock, "UNKNOWN", SEND_RECV_LEN, 0); // message
+			continue;
 		}
+		pthread_mutex_unlock(&stdout_mutex);
 	}
 
 	close(client_send_sock);

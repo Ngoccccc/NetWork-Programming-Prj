@@ -1,9 +1,9 @@
 #ifndef __MESSAGE_H_
 #define __MESSAGE_H_
 
-#define SEND_RECV_LEN 100
-#define BUFFSIZE 128
-#define MSG_NUM 30
+#define SEND_RECV_LEN 256
+#define BUFFSIZE 256
+#define MSG_NUM 256
 
 #define LOGINS "LOGINS" // [from SERVER] require: client(s) to login
 #define LOGINC "LOGINC" // [from CLIENT] inform: client logged in,

@@ -32,7 +32,7 @@ UserNode *login(char **msg, int client_send_sock, int client_recv_sock)
 	node->status = ONLINE;
 	node->recv_sock = client_recv_sock;
 	node->send_sock = client_send_sock;
-	printf("\nUser logged in: %s\n", node->username);
+	printf("\nUser logged in: %s", node->username);
 	sprintf(buff, "LOGIN-SUCCESS-%s-%s", msg[1], msg[2]);
 	send(client_recv_sock, buff, SEND_RECV_LEN, 0); // message
 	return node;
