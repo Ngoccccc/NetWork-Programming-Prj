@@ -14,7 +14,7 @@
 // init variables
 char piece;
 extern char *name;
-extern int sock, valread;
+extern int send_sock, recv_sock, valread;
 extern level;
 // set flags to default values
 int score, showtext = 1, shownext = 1, end, clrlines = 0;
@@ -245,10 +245,9 @@ void checkclr()
                      score += SCORE;
                      score += dropped;
                      dropped = 0;
-                     printf("score update");
-                     char str[20];
-                     sprintf(str, "%d", score);
-                     send(sock, str, strlen(str), 0);
+                     char buff[128];
+                     snprintf(buff, sizeof(buff), "UPGRADE-%s-%d", name, score);
+                     send(send_sock, buff, strlen(buff), 0);
                      updatescore();
                      updatescrn();
               }
@@ -266,25 +265,25 @@ void initpiece()
        next = randomNum % 7;
 
        int receivedNumber = randomNum;
-       while (receivedNumber / 7 < 1)
-       {
-              // Gửi yêu cầu lấy số nguyên từ server
-              char request[] = "SEND_RANDOM";
-              send(sock, request, strlen(request), 0);
+       // while (receivedNumber / 7 < 1)
+       // {
+       //        // Gửi yêu cầu lấy số nguyên từ server
+       //        char request[] = "SEND_RANDOM";
+       //        send(sock, request, strlen(request), 0);
 
-              // Nhận phản hồi từ server
-              char buffer[1024];
-              int bytesRead = recv(sock, buffer, sizeof(buffer), 0);
-              if (bytesRead < 0)
-              {
-                     perror("Receive failed");
-                     exit(EXIT_FAILURE);
-              }
+       //        // Nhận phản hồi từ server
+       //        char buffer[1024];
+       //        int bytesRead = recv(sock, buffer, sizeof(buffer), 0);
+       //        if (bytesRead < 0)
+       //        {
+       //               perror("Receive failed");
+       //               exit(EXIT_FAILURE);
+       //        }
 
-              // Chuyển đổi dữ liệu nhận được thành số nguyên
-              receivedNumber = atoi(buffer);
-       }
-       randomNum = receivedNumber;
+       //        // Chuyển đổi dữ liệu nhận được thành số nguyên
+       //        receivedNumber = atoi(buffer);
+       // }
+       // randomNum = receivedNumber;
 
        switch (current)
        {
@@ -1507,8 +1506,10 @@ int game()
        {
               if (end)
               {
-                     char *gameover = "GAME-OVER";
-                     send(sock, gameover, strlen(gameover), 0);
+                     char gameover[128];
+                     snprintf(gameover, sizeof(gameover), "GAMEOVER-%s", name);
+                     send(send_sock, gameover, strlen(gameover), 0);
+                     return 1;
               }
               switch (getch())
               {
