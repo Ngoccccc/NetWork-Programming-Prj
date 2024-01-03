@@ -499,6 +499,7 @@ void *recv_handler(void *recv_sock)
             // system("clear");
             printf("\n%-62s", "=====================Danh sach cac phong=====================");
             printf("\n%5s|%20s|%14s|%17s|", "ID", "Chu phong", "So nguoi choi", "Cap do cua phong");
+            printf("\n%5s|%20s|%14s|%17s|", "ID", "Chu phong", "So nguoi choi", "Cap do cua phong");
             int room_no = atoi(msg[1]);
             for (int i = 0; i < room_no; i++)
             {
