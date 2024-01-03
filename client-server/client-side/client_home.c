@@ -25,7 +25,7 @@ Room* createJoinRoom(char** msg){
     int i = 0;
     for(; i < inroom_no; i++){
         joinroom->players[i] = (char*) malloc(30);
-        strcpy(joinroom->players[i], msg[i+4]);
+        strcpy(joinroom->players[i], msg[i+5]);
     }
     // for(; i < MAX_PLAYER_PER_ROOM; i++){
     //     joinroom->players[i] = (char*) malloc(10);

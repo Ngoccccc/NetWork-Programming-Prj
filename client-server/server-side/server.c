@@ -15,10 +15,6 @@
 #include "../message.h"
 #include "server.h"
 
-pthread_mutex_t stdout_mutex = PTHREAD_MUTEX_INITIALIZER;
-
-pthread_mutex_t stdout_mutex = PTHREAD_MUTEX_INITIALIZER;
-
 //------------------Globals----------------------
 
 int current_no_room; // current number of room on server
@@ -371,8 +367,6 @@ void *connection_handler(void *client_sockets)
 			continue;
 			continue;
 		}
-		pthread_mutex_unlock(&stdout_mutex);
-		pthread_mutex_unlock(&stdout_mutex);
 	}
 
 	close(client_send_sock);
