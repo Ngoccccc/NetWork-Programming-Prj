@@ -14,11 +14,13 @@
 Room* createJoinRoom(char** msg){
     int room_id = atoi(msg[2]);
     int inroom_no = atoi(msg[3]);
+    int room_level = atoi(msg[4]);
 
     Room* joinroom = (Room*) malloc(BUFFSIZE);
     // joinroom->game = NULL;
     joinroom->inroom_no = inroom_no;
     joinroom->room_id = room_id;
+    joinroom->room_level = room_level;
     joinroom->status = WAITING;
     int i = 0;
     for(; i < inroom_no; i++){
@@ -63,12 +65,12 @@ int requestJoinRoom(int sock){
 }
 
 void exitRoom(int sock){
-    printf("1\n");
+    // printf("1\n");
     char buff[BUFFSIZE];
     snprintf(buff, sizeof(buff), "EXITROOM-%s-%d", current_user->username, my_room->room_id); // message
     send(sock, buff, SEND_RECV_LEN, 0);
     Room* node = my_room;
-    printf("2\n");
+    // printf("2\n");
     freeRoom(node);
     state = LOGGED_IN;
     my_room = NULL;

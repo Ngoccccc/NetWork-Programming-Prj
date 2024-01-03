@@ -17,13 +17,12 @@ void userCreateRoom(char** msg, UserNode** current_user){
 	}
 
 	current_no_room++;
-
 	int room_id = addRoom(rooms, msg[1], atoi(msg[2]));
 
 	(*current_user)->status = INROOM;
 	(*current_user)->room_id = room_id;
 
-	printf("\ncurrent_no_room = %d", current_no_room);
+	// printf("\ncurrent_no_room = %d", current_no_room);
 
 	char buff[BUFFSIZE];
 	snprintf(buff, sizeof(buff), "NEWROOM-SUCCESS-%d-%d", room_id, atoi(msg[2]));
@@ -80,8 +79,6 @@ void userJoinRoom(char** msg, UserNode** current_user){
 	}
 
 	Room* joinroom = rooms[room_id];
-	printf("joinroom %d\n", joinroom->room_id);
-	printf("joinroom %d\n", joinroom->inroom_no);
 	if(joinroom->inroom_no >= MAX_PLAYER_PER_ROOM){
 		snprintf(buff, sizeof(buff), "JOINROOM-FULL-%d", room_id);
 		send((*current_user)->recv_sock, buff, SEND_RECV_LEN, 0);

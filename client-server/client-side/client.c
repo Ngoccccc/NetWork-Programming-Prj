@@ -32,9 +32,10 @@ int af_roll = 1;
 int in_room = 1;
 int level = 1;
 char *name;
-int sock = 0, valread;
+int send_sock = 0, valread;
+int recv_sock = 0;
 int startlevel;
-int randomNum = 1010011010012;
+long int randomNum = 1010011010012;
 int next;
 Room *my_room = NULL;
 
@@ -89,15 +90,14 @@ int main(int argc, const char *argv[])
     // Threading
     pthread_t threads[2];
 
-    if (pthread_create(&threads[0], NULL, send_handler, &client_send_sock) < 0)
-    {
-        puts("Unable to open send thread. Exit.");
-        exit(-1);
-    }
-
-    if (pthread_create(&threads[1], NULL, recv_handler, &client_recv_sock) < 0)
+    if (pthread_create(&threads[0], NULL, recv_handler, &client_recv_sock) < 0)
     {
         puts("Unable to open recv thread. Exit");
+        exit(-1);
+    }
+    if (pthread_create(&threads[1], NULL, send_handler, &client_send_sock) < 0)
+    {
+        puts("Unable to open send thread. Exit.");
         exit(-1);
     }
 
@@ -127,6 +127,7 @@ void home(int sock)
         printf("\n3. Thoat");
         printf("\nLua chon cua ban: ");
         scanf("%d%*c", &choice);
+        fflush(stdout);
         switch (choice)
         {
         case 1:
@@ -183,7 +184,7 @@ void roomLobby(int sock)
                     }
                     break;
                 case 2:
-                    printf("exit\n");
+                    // printf("exit\n");
                     exitRoom(sock);
                     in_room = 0;
                     break;
@@ -232,7 +233,7 @@ void *send_handler(void *send_sock)
             printf("\n2. Dang ki");
             printf("\n3. Thoat");
             printf("\nLua chon cua ban: ");
-            scanf("%d", &choice);
+            scanf("%d%*c", &choice);
             switch (choice)
             {
             case 1:
@@ -271,6 +272,7 @@ void *recv_handler(void *recv_sock)
     char *msg[MSG_NUM];
     while ((recv_bytes = recv(recv_socket, buff, SEND_RECV_LEN, 0) > 0))
     {
+        // printf("\n> Recv: %s", buff);
         meltMsg(buff, msg);
         if (strcmp(msg[0], "LOGIN") == 0)
         {
@@ -389,6 +391,8 @@ void *recv_handler(void *recv_sock)
             if (strcmp(msg[1], "SUCCESS") == 0)
             { // message
                 my_room = createJoinRoom(msg);
+                printf("\n%d joined\n", my_room->room_level);
+                printf("\n%d joined\n", my_room->room_id);
                 room_updating = 1;
                 // system("clear");
                 // for (int k = 0;k<sizeof(msg) / sizeof(msg[0]) ;k++){
@@ -428,7 +432,7 @@ void *recv_handler(void *recv_sock)
             scanf("%d", &xacnhan);
             if (xacnhan == 1)
             {
-                sock = current_user->send_sock;
+                send_sock = current_user->send_sock;
                 name = current_user->username;
                 srand(time(NULL));
                 initscr();
@@ -437,6 +441,7 @@ void *recv_handler(void *recv_sock)
                 init_pair(1, COLOR_GREEN, COLOR_BLACK);
                 init_pair(2, COLOR_RED, COLOR_BLACK);
                 attron(COLOR_PAIR(1));
+                // Room *room = rooms[current_user->room_id];
                 startlevel = my_room->room_level;
                 noecho();
                 curs_set(0);
@@ -450,13 +455,28 @@ void *recv_handler(void *recv_sock)
             }
             continue;
         }
+        if (strcmp(msg[0], "RESULT") == 0)
+        {
+            printf("%s - %s", msg[0], msg[1]);
+            if (strcmp(msg[1], "DRAW") == 0)
+            {
+                printf("Tran dau hoa");
+            }
+            else
+            {
+                printf("Nguoi chien thang la: %s\n", msg[1]);
+            }
+
+            room_updating = 1;
+            printRoom(my_room, current_user->username);
+            state = IN_ROOM;
+            room_updating = 0;
+            roomLobby(current_user->send_sock);
+            continue;
+        }
         // if(strcmp(msg[0], "ROLL") == 0){
         //     game_state = 1;
         //     state = IN_GAME;
-        //     printf("\nDen luot ban !!\n");
-        //     printf("Moi nhap 1\n");
-        //     af_roll = 0;
-        //     roll_control = 1;
         //     continue;
         // }
 
@@ -465,6 +485,7 @@ void *recv_handler(void *recv_sock)
         //     printf("\n");
         //     continue;
         // }
+
         // if(strcmp(msg[0], ENDGAME) == 0){
         //     printf("Tro choi ket thuc !!");
         //     printf("\n");
@@ -477,11 +498,11 @@ void *recv_handler(void *recv_sock)
         {
             // system("clear");
             printf("\n%-62s", "=====================Danh sach cac phong=====================");
-            printf("\n%-5s|%-20s|%s", "ID", "Chu phong", "So nguoi choi");
+            printf("\n%5s|%20s|%14s|%17s|", "ID", "Chu phong", "So nguoi choi", "Cap do cua phong");
             int room_no = atoi(msg[1]);
             for (int i = 0; i < room_no; i++)
             {
-                printf("\n%-5s|%-20s|%s/4", msg[2 + 3 * i], msg[3 + 3 * i], msg[4 + 3 * i]);
+                printf("\n%5s|%20s|%12s/4|%17s|", msg[2 + 4 * i], msg[3 + 4 * i], msg[4 + 4 * i], msg[5 + 4 * i]);
             }
             printf("\n=============================================================");
             state = LOGGED_IN;
