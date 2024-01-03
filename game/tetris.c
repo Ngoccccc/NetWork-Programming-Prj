@@ -10,13 +10,14 @@
 #include "keys.h"
 #include "settings.h"
 #include "tetris.h"
+#include "../client-server/util.h"
 
 // init variables
 char piece;
 extern char *name;
-extern int send_sock, recv_sock, valread;
-extern level;
-// set flags to default values
+extern int send_sock, valread;
+extern int level;
+int *competitorPoint = 0;
 int score, showtext = 1, shownext = 1, end, clrlines = 0;
 extern int next;
 extern int randomNum;
@@ -108,6 +109,16 @@ void updatescore()
        sprintf(tmp, "%-14d", score);
 
        memcpy(left[7] + 9, tmp, 14);
+       free(tmp);
+}
+
+void updateCompetitorScore(int competitorPoint)
+{
+       // updates Cscore
+       char *tmp = malloc(sizeof *tmp * 15);
+       sprintf(tmp, "%-14d", competitorPoint);
+
+       memcpy(left[9] + 10, tmp, 14);
        free(tmp);
 }
 
@@ -204,8 +215,6 @@ int gameover()
        memcpy(center[16], "    : QUIT    : RESET   \0"
                           "        : TOPLIST       \0",
               WIDTH * 2);
-       center[16][3] = toupper(EXT);
-       center[16][13] = toupper(RSET);
        center[17][7] = toupper(TPLS);
        clear();
        printw("\n");
@@ -260,11 +269,19 @@ void initpiece()
        // initializes a new piece
        checkclr();
        int current;
-       randomNum = randomNum / 7;
+       randomNum = randomNum - 5;
        current = next;
-       next = randomNum % 7;
 
-       int receivedNumber = randomNum;
+       if (randomNum == 1)
+       {
+              randomNum += 10;
+       }
+       if (randomNum < 10)
+       {
+              randomNum = randomNum * randomNum;
+       }
+       next = randomNum % 7;
+       // int receivedNumber = randomNum;
        // while (receivedNumber / 7 < 1)
        // {
        //        // Gửi yêu cầu lấy số nguyên từ server
@@ -1393,7 +1410,7 @@ void init()
                        "                        \0"
                        "  SCORE:                \0"
                        "                        \0"
-                       "                        \0"
+                       "  CScore:               \0"
                        "                        \0"
                        "                        \0"
                        "                        \0"
@@ -1439,10 +1456,10 @@ void init()
                         "                        \0"
                         "    : LEFT     :RIGHT   \0"
                         "         :ROTATE        \0"
-                        "    : DROP     :RESET   \0"
+                        "    : DROP              \0"
                         "    : SHOW/HIDE NEXT    \0"
                         "    : HIDE THIS TEXT    \0"
-                        "    : EXIT              \0"
+                        "                        \0"
                         "                        \0"
                         "                        \0"
                         "                        \0"
@@ -1477,10 +1494,8 @@ void setkeybind()
        right[3][14] = toupper(MOVR);
        right[4][8] = toupper(ROTA);
        right[5][3] = toupper(DROP);
-       right[5][14] = toupper(RSET);
        right[6][3] = toupper(SNXT);
        right[7][3] = toupper(STXT);
-       right[8][3] = toupper(EXT);
 }
 
 int game()
@@ -1519,10 +1534,6 @@ int game()
                      ++dropped;
                      updatescrn();
                      continue;
-              case EXT:
-                     return 1;
-              case RSET:
-                     return 0;
               case STXT:
                      if (end)
                             continue;
@@ -1584,12 +1595,7 @@ int game()
        return 1;
 }
 
-Game *makeGame(int roomID, int playerNum, char username1[], char username2[], char username3[], char username4[])
+void setCompetitorPoint(int *point)
 {
-       Game *game = (Game *)malloc(sizeof(Game));
-       game->roomID = roomID;
-       game->playerNum = playerNum - 1;
-       game->p[0] = username1;
-       game->p[1] = username2;
-       return game;
+       competitorPoint = point;
 }

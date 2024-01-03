@@ -200,6 +200,9 @@ void roomLobby(int sock)
                     in_room = 0;
 
                     break;
+                case 3:
+                    printf("San sang\n");
+                    break;
                 default:
                     printf("\nKhong ro cau lenh.\n");
                     break;
@@ -428,37 +431,47 @@ void *recv_handler(void *recv_sock)
         }
         if (strcmp(msg[0], "START") == 0)
         {
-            int xacnhan;
-            printf("Nhap 1 de xac nhan bat dau: ");
-            scanf("%d", &xacnhan);
-            if (xacnhan == 1)
-            {
-                send_sock = current_user->send_sock;
-                name = current_user->username;
-                srand(time(NULL));
-                initscr();
-                start_color();
-                cbreak();
-                init_pair(1, COLOR_GREEN, COLOR_BLACK);
-                init_pair(2, COLOR_RED, COLOR_BLACK);
-                attron(COLOR_PAIR(1));
-                // Room *room = rooms[current_user->room_id];
-                startlevel = my_room->room_level;
-                noecho();
-                curs_set(0);
-                next = randomNum % 7;
-                while (!game())
-                    ;
-                free(name);
-                endwin();
-                printf("Da bat dau");
-                state = IN_GAME;
-            }
+            state = IN_GAME;
+            send_sock = current_user->send_sock;
+            recv_sock = current_user->recv_sock;
+            name = current_user->username;
+            srand(time(NULL));
+            initscr();
+            start_color();
+            cbreak();
+            init_pair(1, COLOR_GREEN, COLOR_BLACK);
+            init_pair(2, COLOR_RED, COLOR_BLACK);
+            attron(COLOR_PAIR(1));
+            // Room *room = rooms[current_user->room_id];
+            startlevel = my_room->room_level;
+            noecho();
+            curs_set(0);
+            next = randomNum % 7;
+            while (!game())
+                ;
+            free(name);
+            endwin();
+            fflush(stdout);
             continue;
         }
+
+        if (strcmp(msg[0], "COMPETITOR") == 0)
+        {
+            printf("Nhan diem doi thu la %s", msg[1]);
+            int competitorScore = atoi(msg[1]);
+            continue;
+        }
+
+        if (strcmp(msg[0], "WAITINGRESULT") == 0)
+        {
+            puts("Vui long doi nguoi choi con lai choi not");
+            state = IN_GAME;
+            continue;
+        }
+
         if (strcmp(msg[0], "RESULT") == 0)
         {
-            printf("%s - %s", msg[0], msg[1]);
+            puts("\n-------------KET QUA VAN DAU-------------");
             if (strcmp(msg[1], "DRAW") == 0)
             {
                 printf("Tran dau hoa");
@@ -467,34 +480,10 @@ void *recv_handler(void *recv_sock)
             {
                 printf("Nguoi chien thang la: %s\n", msg[1]);
             }
-
-            room_updating = 1;
-            printRoom(my_room, current_user->username);
-            state = IN_ROOM;
-            room_updating = 0;
-            roomLobby(current_user->send_sock);
+            puts("\n-------------Tro choi ket thuc-------------\n");
+            printf("test randomNum %ld", randomNum);
             continue;
         }
-        // if(strcmp(msg[0], "ROLL") == 0){
-        //     game_state = 1;
-        //     state = IN_GAME;
-        //     continue;
-        // }
-
-        // if(strcmp(msg[0], WIN) == 0){
-        //     printf("Nguoi choi %s da chien thang !!",my_room->players[atoi(msg[1])]);
-        //     printf("\n");
-        //     continue;
-        // }
-
-        // if(strcmp(msg[0], ENDGAME) == 0){
-        //     printf("Tro choi ket thuc !!");
-        //     printf("\n");
-        //     roll_control = 0;
-        //     af_roll = 0;
-        //     state = IN_ROOM;
-        //     continue;
-        // }
         if (strcmp(msg[0], "ROOMS") == 0)
         {
             // system("clear");
@@ -503,7 +492,7 @@ void *recv_handler(void *recv_sock)
             int room_no = atoi(msg[1]);
             for (int i = 0; i < room_no; i++)
             {
-                printf("\n%5s|%20s|%12s/4|%17s|", msg[2 + 4 * i], msg[3 + 4 * i], msg[4 + 4 * i], msg[5 + 4 * i]);
+                printf("\n%5s|%20s|%12s/2|%17s|", msg[2 + 4 * i], msg[3 + 4 * i], msg[4 + 4 * i], msg[5 + 4 * i]);
             }
             printf("\n=============================================================");
             state = LOGGED_IN;

@@ -11,16 +11,18 @@
 #include "settings.h"
 #include "tetris.h"
 char *name;
-int sock = 0, valread;
+int send_sock = 0, valread;
 int startlevel;
 int randomNum = 1010011010012;
 int next;
+int *competitorPoint;
+int level = 1;
 int main(void)
 {
   // main function
   struct sockaddr_in serv_addr;
   char buffer[1024] = {0};
-  if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+  if ((send_sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
   {
     printf("\n Socket creation error \n");
     return -1;
@@ -29,7 +31,7 @@ int main(void)
   serv_addr.sin_port = htons(PORT);
 
   // Kết nối tới server
-  if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
+  if (connect(send_sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
   {
     printf("\nConnection Failed \n");
     return -1;
@@ -60,6 +62,6 @@ int main(void)
     ;
   free(name);
   endwin();
-  close(sock);
+  close(send_sock);
   return 0;
 }
