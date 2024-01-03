@@ -33,7 +33,6 @@ void setkeybind();
 int game();
 void updateCompetitorScore(int competitorPoint);
 void setCompetitorPoint(int *point);
-Game *makeGame(int roomID, int playerNum, char username1[], char username2[], char username3[], char username4[]);
 
 #ifndef __TETRIS_H__
 
