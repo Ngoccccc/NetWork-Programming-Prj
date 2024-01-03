@@ -11,6 +11,13 @@
 #include "../../room/room.h"
 #include "../util.h"
 
+void printLeaderboard(char** msg){
+    fflush(stdout);
+    for (int i = 1; msg[i] != NULL; ++i) {
+        printf("%s\n", msg[i]);
+    }
+}
+
 Room* createJoinRoom(char** msg){
     int room_id = atoi(msg[2]);
     int inroom_no = atoi(msg[3]);
@@ -39,6 +46,13 @@ void requestCreateRoom(int sock, int level){
     sprintf(buff, "NEWROOM-%s-%d", current_user->username, level);
     send(sock, buff, SEND_RECV_LEN, 0);
     state = WAITING_RESPONSE;
+}
+
+void requestLeaderboard(int sock){
+    char buff[BUFFSIZE];
+    sprintf(buff, "LEADERBOARD");
+    send(sock, buff, SEND_RECV_LEN, 0);
+    state = LOGGED_IN;
 }
 
 int requestJoinRoom(int sock){

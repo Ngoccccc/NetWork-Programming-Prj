@@ -6,6 +6,7 @@
 #define WIDTH 25
 #define HEIGHT 24
 #define TOPLSITMAXLINELENGTH 34
+#define TOPLIST "toplist"
 
 typedef struct
 {

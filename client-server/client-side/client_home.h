@@ -11,6 +11,8 @@ extern Room* my_room;
 void requestCreateRoom(int sock, int level);
 
 int requestJoinRoom();
+void printLeaderboard(char** msg);
+void requestLeaderboard(int sock);
 
 void requestFindRoom();
 

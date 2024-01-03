@@ -37,6 +37,7 @@ int recv_sock = 0;
 int startlevel;
 long int randomNum = 1010011010012;
 int next;
+int done_leaderboard = 1;
 Room *my_room = NULL;
 
 //----------User Interfaces------------
@@ -117,51 +118,62 @@ int main(int argc, const char *argv[])
 void home(int sock)
 {
     int choice;
+
     do
     {
-        // system("clear");
-        printf("\n-----------Sanh cho-----------");
-        printf("\nXin chao %s", current_user->username);
-        printf("\n1. Tao phong");
-        printf("\n2. Tham gia phong");
-        printf("\n3. Thoat");
-        printf("\nLua chon cua ban: ");
-        scanf("%d%*c", &choice);
-        fflush(stdout);
-        switch (choice)
+        if (state == LOGGED_IN && done_leaderboard == 1)
         {
-        case 1:
-
-            printf("Nhap level cua phong: ");
-            scanf("%d%*c", &level);
-            requestCreateRoom(sock, level);
-            roomLobby(sock);
-            while (in_room)
+            // system("clear");
+            printf("\n-----------Sanh cho-----------");
+            printf("\nXin chao %s", current_user->username);
+            printf("\n1. Tao phong");
+            printf("\n2. Tham gia phong");
+            printf("\n3. Xem bang xep hang");
+            printf("\n4. Thoat");
+            printf("\nLua chon cua ban: ");
+            scanf("%d%*c", &choice);
+            fflush(stdout);
+            switch (choice)
             {
-            }
-            break;
-        case 2:
-            if (requestJoinRoom(sock))
-            {
+            case 1:
+                printf("Nhap level cua phong: ");
+                scanf("%d%*c", &level);
+                requestCreateRoom(sock, level);
+                in_room = 1;
                 roomLobby(sock);
                 while (in_room)
                 {
                 }
+                break;
+            case 2:
+                if (requestJoinRoom(sock))
+                {
+                    roomLobby(sock);
+                    while (in_room)
+                    {
+                    }
+                }
+                break;
+            case 3:
+                done_leaderboard = 0;
+                requestLeaderboard(sock);
+                break;
+            case 4:
+                requestLogout(sock);
+                break;
+            default:
+                printf("\nLa sao? Nhap lai coi\n");
+                break;
             }
-            break;
-        case 3:
-            requestLogout(sock);
-            break;
-        default:
-            printf("\nLa sao? Nhap lai coi\n");
-            break;
         }
-    } while (choice != 3);
+
+    } while (choice != 4);
 }
 
 void roomLobby(int sock)
 {
     int choice;
+    printf("in room: %d\n", in_room);
     while (state == IN_ROOM || state == WAITING_RESPONSE)
     {
         if (state == IN_GAME)
@@ -184,9 +196,9 @@ void roomLobby(int sock)
                     }
                     break;
                 case 2:
-                    // printf("exit\n");
                     exitRoom(sock);
                     in_room = 0;
+
                     break;
                 default:
                     printf("\nKhong ro cau lenh.\n");
@@ -200,21 +212,6 @@ void roomLobby(int sock)
     while (state == IN_GAME)
     {
         // play game and send data
-
-        // int choice2;
-        // scanf("%d", &choice2);
-        // char buff[BUFFSIZE];
-        // int dice;
-        // switch(choice2){
-        //     case 1:
-        //         dice = rollDice();
-        //         printf("\nBan tung duoc %d\n", dice);
-        //         sprintf(buff, "DICE-%d", dice);
-        //         send(current_user->send_sock, buff, SEND_RECV_LEN, 0);
-        //         while(roll_control){}
-        //         break;
-        //     default: printf("\n ban nhap sai\n"); break;
-        // }
     }
 }
 
@@ -272,8 +269,14 @@ void *recv_handler(void *recv_sock)
     char *msg[MSG_NUM];
     while ((recv_bytes = recv(recv_socket, buff, SEND_RECV_LEN, 0) > 0))
     {
-        // printf("\n> Recv: %s", buff);
         meltMsg(buff, msg);
+        if (strcmp(msg[0], "LEADERBOARD") == 0)
+        {
+            printLeaderboard(msg);
+            state = LOGGED_IN;
+            done_leaderboard = 1;
+            continue;
+        }
         if (strcmp(msg[0], "LOGIN") == 0)
         {
             if (strcmp(msg[1], "SUCCESS") == 0)
