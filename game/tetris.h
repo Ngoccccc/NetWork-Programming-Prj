@@ -34,7 +34,7 @@ int game();
 void updateCompetitorScore(int competitorPoint);
 void setCompetitorPoint(int *point);
 
-#ifndef __TETRIS_H__
+#endif
 
 
 
