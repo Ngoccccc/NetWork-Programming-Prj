@@ -15,10 +15,6 @@
 #include "../message.h"
 #include "server.h"
 
-pthread_mutex_t stdout_mutex = PTHREAD_MUTEX_INITIALIZER;
-
-pthread_mutex_t stdout_mutex = PTHREAD_MUTEX_INITIALIZER;
-
 //------------------Globals----------------------
 
 int current_no_room; // current number of room on server
@@ -26,7 +22,6 @@ int total_user;
 int server_socket;
 UserNode *users;
 Room *rooms[MAX_ROOM_ALLOWED];
-
 //---------------------Base functions declarations---------------------
 
 // Remember to use -pthread when compiling this server's source code
@@ -289,6 +284,14 @@ void *connection_handler(void *client_sockets)
 					room->point[i] = point;
 					printf("User: %s have point %d", room->players[i], room->point[i]);
 				}
+				else
+				{
+					UserNode *user = searchUser(users, room->players[i]);
+					char buff[128];
+					snprintf(buff, sizeof(buff), "COMPETITOR-%s", msg[2]);
+					send(user->recv_sock, buff, SEND_RECV_LEN, 0);
+					printf("\n>Send: %s\n", buff);
+				}
 			}
 			continue;
 		}
@@ -345,6 +348,10 @@ void *connection_handler(void *client_sockets)
 			else
 			{
 				printf("Send waiting message");
+				char buff[128];
+				strcpy(buff, "WAITINGRESULT");
+				send(user->recv_sock, buff, SEND_RECV_LEN, 0);
+				printf("Send: %s\n", buff);
 			}
 			continue;
 		}
@@ -371,8 +378,6 @@ void *connection_handler(void *client_sockets)
 			continue;
 			continue;
 		}
-		pthread_mutex_unlock(&stdout_mutex);
-		pthread_mutex_unlock(&stdout_mutex);
 	}
 
 	close(client_send_sock);
