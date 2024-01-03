@@ -6,7 +6,6 @@
 #define WIDTH 25
 #define HEIGHT 24
 #define TOPLSITMAXLINELENGTH 34
-
 typedef struct
 {
   int roomID;
@@ -17,6 +16,8 @@ typedef struct
 void show_next();
 void updatescrn();
 void updatescore();
+void updateCompetitorScore(int competitorPoint);
+void setCompetitorPoint(int *point);
 void toplist();
 void addscore();
 int gameover();
@@ -30,6 +31,5 @@ void init();
 void updatelevel();
 void setkeybind();
 int game();
-Game *makeGame(int roomID, int playerNum, char username1[], char username2[], char username3[], char username4[]);
 
 #endif
