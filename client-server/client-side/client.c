@@ -39,7 +39,7 @@ int send_sock = 0, valread;
 int recv_sock = 0;
 int game_sock = 0;
 int startlevel;
-long int randomNum = 1010011010012;
+long int randomNum = 0;
 int next;
 int done_leaderboard = 1;
 Room *my_room = NULL;
@@ -479,6 +479,7 @@ void *recv_handler(void *recv_sock)
         }
         if (strcmp(msg[0], "START") == 0)
         {
+            randomNum = atol(msg[1]);
             state = IN_GAME;
             send_sock = current_user->send_sock;
             recv_sock = current_user->recv_sock;
