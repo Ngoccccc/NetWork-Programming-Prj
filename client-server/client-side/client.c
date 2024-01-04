@@ -223,8 +223,8 @@ void roomLobby(int sock)
     // printf("in room: %d\n", in_room);
     while (state == IN_ROOM || state == WAITING_RESPONSE)
     {
-        if (state == IN_GAME)
-            break;
+        // if (state == IN_GAME)
+        //     break;
         if (state == IN_ROOM && room_updating == 0)
         {
             if (state != IN_GAME)
@@ -245,7 +245,6 @@ void roomLobby(int sock)
                 case 2:
                     exitRoom(sock);
                     in_room = 0;
-
                     break;
                 case 3:
                     printf("San sang\n");
@@ -259,10 +258,10 @@ void roomLobby(int sock)
             }
         }
     }
-    while (state == IN_GAME)
-    {
-        // play game and send data
-    }
+    // while (state == IN_GAME)
+    // {
+    //     // play game and send data
+    // }
 }
 
 //------------------------------------------------------------
@@ -546,7 +545,11 @@ void *recv_handler(void *recv_sock)
                 printf("Nguoi chien thang la: %s\n", msg[1]);
             }
             puts("\n-------------Tro choi ket thuc-------------\n");
-            printf("test randomNum %ld", randomNum);
+            // printf("test randomNum %ld", randomNum);
+            // state = IN_ROOM;
+            // room_updating = 0;
+            send(send_sock, "exit", SEND_RECV_LEN, 0);
+            printf("\nChoi xong roi, ca lang giai tan!!\n");
             continue;
         }
         if (strcmp(msg[0], "ROOMS") == 0)
