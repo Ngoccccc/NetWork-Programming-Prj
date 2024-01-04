@@ -27,7 +27,7 @@ Room *rooms[MAX_ROOM_ALLOWED];
 // Remember to use -pthread when compiling this server's source code
 void *connection_handler(void *);
 // void* gameloop_handler(void*);
-void resolve(char *client_message, UserNode *current_user, int client_send_sock, int client_recv_sock);
+void resolve(char *client_message, UserNode *current_user, int client_send_sock, int client_recv_sock, int client_game_sock);
 void initGlobals();
 
 //-------------------------- Main --------------------------
@@ -83,6 +83,7 @@ int main(int argc, const char *args[])
 	struct sockaddr_in client_addr;
 	int client_send_sock;
 	int client_recv_sock;
+	int client_game_sock;
 	unsigned int sin_size = sizeof((struct sockaddr *)&client_addr);
 
 	int no_threads = 0; // number of threads accepted
@@ -108,11 +109,22 @@ int main(int argc, const char *args[])
 		}
 		else
 			puts("> Client's recv-sock accepted");
+
+		client_game_sock = accept(server_socket, (struct sockaddr *)&client_addr, &sin_size);
+		if (client_game_sock < 0)
+		{
+			printf("Server failed to accept client's game-stream\n");
+			exit(0);
+		}
+		else
+			puts("> Client's game-sock accepted");
+
 		puts("Connection accepted");
 
 		ThrdHandlerArgs args;
 		args.client_recv_sock = client_recv_sock;
 		args.client_send_sock = client_send_sock;
+		args.client_game_sock = client_game_sock;
 		if (pthread_create(&threads[no_threads], NULL, connection_handler, &args) < 0)
 		{
 			perror("Could not create thread");
@@ -169,6 +181,7 @@ void *connection_handler(void *client_sockets)
 	// int socket = *(int*) client_socket;
 	int client_send_sock = (*(ThrdHandlerArgs *)client_sockets).client_send_sock;
 	int client_recv_sock = (*(ThrdHandlerArgs *)client_sockets).client_recv_sock;
+	int client_game_sock = (*(ThrdHandlerArgs *)client_sockets).client_game_sock;
 
 	char *msg[MSG_NUM];
 
@@ -189,12 +202,12 @@ void *connection_handler(void *client_sockets)
 		meltMsg(client_message, msg);
 		if (strcmp(msg[0], "LOGIN") == 0)
 		{ // message prefix
-			current_user = login(msg, client_send_sock, client_recv_sock);
+			current_user = login(msg, client_send_sock, client_recv_sock, client_game_sock);
 			continue;
 		}
 		if (strcmp(msg[0], "SIGNUP") == 0)
 		{
-			signup(msg, &current_user, client_send_sock, client_recv_sock);
+			signup(msg, &current_user, client_send_sock, client_recv_sock, client_game_sock);
 			continue;
 		}
 		if (strcmp(msg[0], "LOGOUT") == 0)
@@ -275,11 +288,10 @@ void *connection_handler(void *client_sockets)
 		}
 		if (strcmp(msg[0], "UPGRADE") == 0)
 		{
-			printf("%s-%s\n", msg[1], msg[2]);
 			UserNode *user = searchUser(users, msg[1]);
-			printf("%s\n", user->username);
+			// printf("%s\n", user->username);
 			Room *room = rooms[user->room_id];
-			printf("%s\n", room->players[0]);
+			// printf("%s\n", room->players[0]);
 			for (int i = 0; i < room->inroom_no; i++)
 			{
 				printf("%s\n", room->players[i]);
@@ -294,8 +306,10 @@ void *connection_handler(void *client_sockets)
 					UserNode *user = searchUser(users, room->players[i]);
 					char buff[128];
 					snprintf(buff, sizeof(buff), "COMPETITOR-%s", msg[2]);
-					send(user->recv_sock, buff, SEND_RECV_LEN, 0);
-					printf("\n>Send: %s\n", buff);
+					send(client_game_sock, buff, SEND_RECV_LEN, 0);
+					printf("server game sock: %d\n", client_game_sock);
+					// printf("send: %d send2: %d\n", client_send_sock, user->send_sock);
+					printf("\n> Send: %s\n", buff);
 				}
 			}
 			continue;
@@ -303,16 +317,16 @@ void *connection_handler(void *client_sockets)
 
 		if (strcmp(msg[0], "GAMEOVER") == 0)
 		{
-			printf("User: %s is game over\n", msg[1]);
+			printf("\nUser: %s is game over\n", msg[1]);
 			UserNode *user = searchUser(users, msg[1]);
-			printf("%s\n", user->username);
+			// printf("%s\n", user->username);
 			Room *room = rooms[user->room_id];
 			for (int i = 0; i < room->inroom_no; i++)
 			{
 				if (strcmp(user->username, room->players[i]) == 0)
 				{
 					room->isEndGame[i] = 1;
-					printf("\nUser: %s has point %d", room->players[i], room->point[i]);
+					printf("\nUser: %s has point %d\n", room->players[i], room->point[i]);
 				}
 			}
 
@@ -343,7 +357,7 @@ void *connection_handler(void *client_sockets)
 					user->room_id = -1;
 					printf("Da gui %s den user: %s\n", buff, user->username);
 				}
-				printf("Winer is %s\n", buff);
+				printf("Winner is %s\n", buff);
 				for (int i = 0; i < room->inroom_no; i++)
 				{
 					room->point[i] = 0;

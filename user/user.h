@@ -19,6 +19,7 @@ typedef struct UserNode
   UserStatus status;
   int room_id;
   int send_sock;
+  int game_sock;
   int recv_sock;
   struct UserNode *left, *right;
 } UserNode;

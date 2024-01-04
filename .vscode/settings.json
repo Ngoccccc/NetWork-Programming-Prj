@@ -1,5 +1,10 @@
 {
     "files.associations": {
-        "client_home.h": "c"
+        "client_home.h": "c",
+        "util.h": "c",
+        "tetris.h": "c",
+        "settings.h": "c",
+        "keys.h": "c",
+        "client.h": "c"
     }
 }

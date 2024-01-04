@@ -6,6 +6,7 @@
 typedef struct {
     int client_send_sock;
     int client_recv_sock;
+    int client_game_sock;
 } ThrdHandlerArgs;
 
 #define SERVER_PORT 9999

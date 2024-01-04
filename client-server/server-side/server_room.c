@@ -22,7 +22,7 @@ void userCreateRoom(char** msg, UserNode** current_user){
 	(*current_user)->status = INROOM;
 	(*current_user)->room_id = room_id;
 
-	// printf("\ncurrent_no_room = %d", current_no_room);
+	printf("\ncurrent_no_room = %d", current_no_room);
 
 	char buff[BUFFSIZE];
 	snprintf(buff, sizeof(buff), "NEWROOM-SUCCESS-%d-%d", room_id, atoi(msg[2]));

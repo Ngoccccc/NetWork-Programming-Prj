@@ -1,6 +1,7 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <fcntl.h>
 #include <string.h>
 #include <sys/time.h>
 #include <time.h>
@@ -9,6 +10,7 @@
 #include <arpa/inet.h>
 #include "keys.h"
 #include "settings.h"
+#include "../client-server/client-side/client.h"
 #include "tetris.h"
 #include "../client-server/util.h"
 
@@ -16,8 +18,12 @@
 char piece;
 extern char *name;
 extern int send_sock, valread;
+extern int recv_sock;
+extern int game_sock;
 extern int level;
 int *competitorPoint = 0;
+int rp = 0;
+// extern int rivalPoint = 0;
 int score, showtext = 1, shownext = 1, end, clrlines = 0;
 extern int next;
 extern int randomNum;
@@ -79,6 +85,21 @@ void show_next()
        }
 }
 
+int setSocketNonBlocking(int sockfd) {
+    int flags = fcntl(sockfd, F_GETFL, 0);
+    if (flags == -1) {
+        perror("fcntl F_GETFL");
+        return -1;
+    }
+
+    if (fcntl(sockfd, F_SETFL, flags | O_NONBLOCK) == -1) {
+        perror("fcntl F_SETFL O_NONBLOCK");
+        return -1;
+    }
+
+    return 0;
+}
+
 void updatescrn()
 {
        // self explanatory, refreshes screen
@@ -112,11 +133,31 @@ void updatescore()
        free(tmp);
 }
 
-void updateCompetitorScore(int competitorPoint)
+void updateCompetitorScore()
 {
+       char buff[256];
+       int recv_bytes;
+       char *msg[256];
+       setSocketNonBlocking(game_sock);
+       printf("client game sock %d\n", game_sock);
+
+       recv_bytes = recv(game_sock, buff, sizeof(buff), 0);
+       if (recv_bytes > 0) {
+              buff[recv_bytes] = '\0';
+              meltMsg(buff, msg);
+              rp = atoi(msg[1]);
+              printf("Received data: %s\n", buff);
+       } else if (recv_bytes == 0) {
+              // Connection closed by the peer
+              printf("Connection closed by the peer\n");
+       } else {
+              // Handle the error
+              perror("recv");
+       }
+
        // updates Cscore
        char *tmp = malloc(sizeof *tmp * 15);
-       sprintf(tmp, "%-14d", competitorPoint);
+       sprintf(tmp, "%-14d", rp);
 
        memcpy(left[9] + 10, tmp, 14);
        free(tmp);
@@ -270,7 +311,8 @@ void initpiece()
        checkclr();
        int current;
        randomNum = randomNum - 5;
-       current = next;
+       // current = next;
+       current = 3;
 
        if (randomNum == 1)
        {
@@ -1512,6 +1554,7 @@ int game()
        memcpy(left[3] + 10, name, strlen(name));
        getch();
        updatescore();
+       updateCompetitorScore();
        updatelevel();
        initpiece();
        updatescrn();

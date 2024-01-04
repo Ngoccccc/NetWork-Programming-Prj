@@ -31,7 +31,10 @@ void init();
 void updatelevel();
 void setkeybind();
 int game();
-void updateCompetitorScore(int competitorPoint);
+// void updateCompetitorScore(int competitorPoint);
+
+void updateCompetitorScore();
+
 void setCompetitorPoint(int *point);
 
 #endif

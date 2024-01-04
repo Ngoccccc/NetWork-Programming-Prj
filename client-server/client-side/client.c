@@ -27,13 +27,17 @@ int room_updating = 0;
 int game_state = 0;
 int client_recv;
 int client_send;
+int client_game;
 int roll_control = 1;
 int af_roll = 1;
 int in_room = 1;
 int level = 1;
+
+
 char *name;
 int send_sock = 0, valread;
 int recv_sock = 0;
+int game_sock = 0;
 int startlevel;
 long int randomNum = 1010011010012;
 int next;
@@ -50,7 +54,7 @@ void roomLobby(int sock);
 
 void *recv_handler(void *recv_sock);
 void *send_handler(void *send_sock);
-
+void *gameMessageReceiver(void *game_socket);
 //------------------------------------
 
 int main(int argc, const char *argv[])
@@ -66,6 +70,9 @@ int main(int argc, const char *argv[])
 
     int client_recv_sock;
     client_recv_sock = socket(AF_INET, SOCK_STREAM, 0);
+
+    int client_game_sock;
+    client_game_sock = socket(AF_INET, SOCK_STREAM, 0);
 
     // specify an address for the socket
     struct sockaddr_in server_address;
@@ -85,11 +92,18 @@ int main(int argc, const char *argv[])
         exit(-1);
     }
 
+    if (connect(client_game_sock, (struct sockaddr *)&server_address, sizeof(server_address)) == -1)
+    {
+        puts("Unable to connect game-stream to server. Exit");
+        exit(-1);
+    }
+
     client_recv = client_recv_sock;
     client_send = client_send_sock;
+    client_game = client_game_sock;
 
     // Threading
-    pthread_t threads[2];
+    pthread_t threads[3];
 
     if (pthread_create(&threads[0], NULL, recv_handler, &client_recv_sock) < 0)
     {
@@ -101,16 +115,48 @@ int main(int argc, const char *argv[])
         puts("Unable to open send thread. Exit.");
         exit(-1);
     }
+    if (pthread_create(&threads[2], NULL, gameMessageReceiver, &client_game_sock) < 0){
+        puts("Unable to open game recv thread. Exit");
+        exit(-1);
+    }
 
     // join threads
     pthread_join(threads[0], NULL);
     pthread_join(threads[1], NULL);
+    pthread_join(threads[2], NULL);
 
     // close sockets
     close(client_send_sock);
     close(client_recv_sock);
+    close(client_game_sock);
 
     return 0;
+}
+
+void *gameMessageReceiver(void *game_socket) {
+    int game_sock = *(int *)game_socket;
+
+    char buff[BUFFSIZE];
+    char *msg[MSG_NUM];
+    int recv_bytes;
+
+    while ((recv_bytes = recv(game_sock, buff, SEND_RECV_LEN, 0)) > 0) {
+        printf(">> Receive: %s\n", buff);
+        meltMsg(buff, msg);
+        if (strcmp(msg[0], "COMPETITOR") == 0)
+        {
+            rivalPoint = atoi(msg[1]);
+            printf("\nrival score 1: %d\n", rivalPoint);
+        }
+    }
+
+    if (recv_bytes < 0) {
+        perror("Error occurs in connection");
+    } else {
+        puts("Connection closed");
+    }
+
+    return NULL;
 }
 
 //------------------------------------------------------------
@@ -267,6 +313,7 @@ void *send_handler(void *send_sock)
 void *recv_handler(void *recv_sock)
 {
     int recv_socket = *(int *)recv_sock;
+
     int recv_bytes;
     char buff[BUFFSIZE];
     char *msg[MSG_NUM];
@@ -288,6 +335,7 @@ void *recv_handler(void *recv_sock)
                 current_user = createUserNode(msg[2], msg[3]);
                 current_user->recv_sock = client_recv;
                 current_user->send_sock = client_send;
+                current_user->game_sock = client_game;
                 state = LOGGED_IN;
                 continue;
             }
@@ -434,6 +482,7 @@ void *recv_handler(void *recv_sock)
             state = IN_GAME;
             send_sock = current_user->send_sock;
             recv_sock = current_user->recv_sock;
+            game_sock = current_user->game_sock;
             name = current_user->username;
             srand(time(NULL));
             initscr();
@@ -447,20 +496,26 @@ void *recv_handler(void *recv_sock)
             noecho();
             curs_set(0);
             next = randomNum % 7;
-            while (!game())
-                ;
+            // while (!game())
+            //     {}
+            game();
+            
             free(name);
             endwin();
             fflush(stdout);
+            af_roll = 0;
+
             continue;
         }
 
-        if (strcmp(msg[0], "COMPETITOR") == 0)
-        {
-            printf("Nhan diem doi thu la %s", msg[1]);
-            int competitorScore = atoi(msg[1]);
-            continue;
-        }
+        // if (strcmp(msg[0], "COMPETITOR") == 0)
+        // {
+        //     printf("Nhan diem doi thu la %s\n", msg[1]);
+        //     int competitorScore = atoi(msg[1]);
+        //     rivalPoint = atoi(msg[1]);
+        //     printf("rival score 1: %d\n", rivalPoint);
+        //     continue;
+        // }
 
         if (strcmp(msg[0], "WAITINGRESULT") == 0)
         {

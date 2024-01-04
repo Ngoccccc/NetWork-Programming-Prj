@@ -3,7 +3,7 @@
 
 #define SERVER_IP "127.0.0.1"
 #define SERVER_PORT 9999
-
+static int rivalPoint = 1;
 enum {
     WAITING_RESPONSE,
     NOT_LOGGED_IN,
