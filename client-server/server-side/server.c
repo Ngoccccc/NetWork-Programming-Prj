@@ -194,7 +194,7 @@ void *connection_handler(void *client_sockets)
 	while ((read_len = recv(client_send_sock, client_message, SEND_RECV_LEN, 0)) > 0)
 	{
 		client_message[read_len] = '\0';
-		printf("\n> Recv: %s", client_message);
+		printf("\n> Recv: %s\n", client_message);
 		if (strcmp(client_message, "exit") == 0)
 		{
 			break;
@@ -202,7 +202,7 @@ void *connection_handler(void *client_sockets)
 
 		meltMsg(client_message, msg);
 		if (strcmp(msg[0], "LOGIN") == 0)
-		{ // message prefix
+		{ 
 			current_user = login(msg, client_send_sock, client_recv_sock, client_game_sock);
 			continue;
 		}
@@ -212,18 +212,17 @@ void *connection_handler(void *client_sockets)
 			continue;
 		}
 		if (strcmp(msg[0], "LOGOUT") == 0)
-		{ // message prefix
+		{ 
 			logout(msg, &current_user);
 			continue;
 		}
 		if (strcmp(msg[0], "NEWROOM") == 0)
-		{ // message prefix
-			// printf("new rôm");
+		{ 
 			userCreateRoom(msg, &current_user);
 			continue;
 		}
 		if (strcmp(msg[0], "EXITROOM") == 0)
-		{ // message prefix
+		{ 
 			userExitRoom(msg, &current_user);
 			continue;
 		}
@@ -291,15 +290,15 @@ void *connection_handler(void *client_sockets)
 				{
 					int point = atoi(msg[2]);
 					room->point[i] = point;
-					printf("User: %s have point %d", room->players[i], room->point[i]);
+					printf("User: %s have point %d\n", room->players[i], room->point[i]);
 				}
 				else
 				{
 					UserNode *user = searchUser(users, room->players[i]);
 					char buff[128];
-					snprintf(buff, sizeof(buff), "COMPETITOR-%s", msg[2]);
-					send(client_game_sock, buff, SEND_RECV_LEN, 0);
-					printf("server game sock: %d\n", client_game_sock);
+					snprintf(buff, sizeof(buff), "COMPETITOR-%s-%s", msg[1], msg[2]);
+					send(user->game_sock, buff, SEND_RECV_LEN, 0);
+					printf("server game sock: %d\n", user->game_sock);
 					// printf("send: %d send2: %d\n", client_send_sock, user->send_sock);
 					printf("\n> Send: %s\n", buff);
 				}

@@ -17,6 +17,7 @@
 // init variables
 char piece;
 extern char *name;
+extern char *opponent;
 extern int send_sock, valread;
 extern int recv_sock;
 extern int game_sock;
@@ -85,19 +86,22 @@ void show_next()
        }
 }
 
-int setSocketNonBlocking(int sockfd) {
-    int flags = fcntl(sockfd, F_GETFL, 0);
-    if (flags == -1) {
-        perror("fcntl F_GETFL");
-        return -1;
-    }
+int setSocketNonBlocking(int sockfd)
+{
+       int flags = fcntl(sockfd, F_GETFL, 0);
+       if (flags == -1)
+       {
+              perror("fcntl F_GETFL");
+              return -1;
+       }
 
-    if (fcntl(sockfd, F_SETFL, flags | O_NONBLOCK) == -1) {
-        perror("fcntl F_SETFL O_NONBLOCK");
-        return -1;
-    }
+       if (fcntl(sockfd, F_SETFL, flags | O_NONBLOCK) == -1)
+       {
+              perror("fcntl F_SETFL O_NONBLOCK");
+              return -1;
+       }
 
-    return 0;
+       return 0;
 }
 
 void updatescrn()
@@ -139,27 +143,24 @@ void updateCompetitorScore()
        int recv_bytes;
        char *msg[256];
        setSocketNonBlocking(game_sock);
-       printf("client game sock %d\n", game_sock);
+       // printf("client game sock %d\n", game_sock);
 
-       recv_bytes = recv(game_sock, buff, sizeof(buff), 0);
-       if (recv_bytes > 0) {
-              buff[recv_bytes] = '\0';
+       if ((recv_bytes = recv(game_sock, buff, 256, 0)) > 0)
+       {
+              // printf(">> Receive: %s\n", buff);
+              // send(send_sock, buff, 256, 0);
               meltMsg(buff, msg);
-              rp = atoi(msg[1]);
-              printf("Received data: %s\n", buff);
-       } else if (recv_bytes == 0) {
-              // Connection closed by the peer
-              printf("Connection closed by the peer\n");
-       } else {
-              // Handle the error
-              perror("recv");
+              // if ((strcmp(msg[0], "COMPETITOR") == 0) && strcmp(msg[1], opponent) == 0)
+              if ((strcmp(msg[0], "COMPETITOR") == 0))
+              {
+                     rp = atoi(msg[2]);
+              }
        }
-
        // updates Cscore
        char *tmp = malloc(sizeof *tmp * 15);
-       sprintf(tmp, "%-14d", rp);
+       sprintf(tmp, "%-6d", rp);
 
-       memcpy(left[9] + 10, tmp, 14);
+       memcpy(left[10] + 10, tmp, 6);
        free(tmp);
 }
 
@@ -1452,8 +1453,8 @@ void init()
                        "                        \0"
                        "  SCORE:                \0"
                        "                        \0"
-                       "  CScore:               \0"
-                       "                        \0"
+                       "  OPP:                  \0"
+                       "  OSCORE:               \0"
                        "                        \0"
                        "                        \0"
                        "                        \0"
@@ -1552,9 +1553,10 @@ int game()
        level = startlevel;
        clrlines = 0;
        memcpy(left[3] + 10, name, strlen(name));
+       memcpy(left[9] + 10, opponent, strlen(opponent));
        getch();
        updatescore();
-       updateCompetitorScore();
+
        updatelevel();
        initpiece();
        updatescrn();
@@ -1562,6 +1564,7 @@ int game()
        gettimeofday(&t1, NULL);
        while (!usleep(DELAY))
        {
+              updateCompetitorScore();
               if (end)
               {
                      char gameover[128];
