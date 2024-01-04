@@ -14,6 +14,7 @@
 #include "server_user.h"
 #include "../message.h"
 #include "server.h"
+#include "time.h"
 
 //------------------Globals----------------------
 
@@ -241,6 +242,8 @@ void *connection_handler(void *client_sockets)
 		if (strcmp(msg[0], "STARTC") == 0)
 		{
 			printf("> Recv: STARTC");
+			time_t currentTime = time(NULL);
+			printf("Thoi gian hien tai: %ld giay tu Epoch\n", currentTime);
 			Room *room = rooms[current_user->room_id];
 			room->point[0] = 0;
 			room->point[1] = 0;
@@ -250,26 +253,15 @@ void *connection_handler(void *client_sockets)
 			}
 			else
 			{
-
+				char buff[128];
+				snprintf(buff, sizeof(buff), "START-%ld", currentTime);
+				printf("Test random %s\n", buff);
 				for (int i = 0; i < room->inroom_no; i++)
 				{
 					UserNode *user = searchUser(users, room->players[i]);
-					send(user->recv_sock, "START", SEND_RECV_LEN, 0);
+					send(user->recv_sock, buff, SEND_RECV_LEN, 0);
 				}
 				room->status = PLAYING;
-				// if(checkEndGame(room->game) != room->game->playerNum){
-				// 	int pid = room->game->turn % (room->game->playerNum + 1);
-				// 	if(checkWin(room->game->p[pid]) == 1){
-				// 		// printf("in 1\n");
-				// 		room->game->turn += 1;
-				// 	} else {
-				// 		// printf("in 2\n");
-				// 		room->game->turn += 1;
-				// 		UserNode* user = searchUser(users, room->game->p[pid].username);
-				// 		send(user->recv_sock, ROLL, SEND_RECV_LEN, 0);
-				// 	}
-				// 	// printf("Turn: %d", room->game->turn);
-				// }
 			}
 			continue;
 		}
