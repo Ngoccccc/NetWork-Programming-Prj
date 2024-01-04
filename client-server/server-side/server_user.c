@@ -10,7 +10,7 @@
 
 extern UserNode *users;
 
-UserNode *login(char **msg, int client_send_sock, int client_recv_sock)
+UserNode *login(char **msg, int client_send_sock, int client_recv_sock, int client_game_sock)
 {
 	char buff[BUFFSIZE];
 	UserNode *node = searchUser(users, msg[1]);
@@ -32,6 +32,7 @@ UserNode *login(char **msg, int client_send_sock, int client_recv_sock)
 	node->status = ONLINE;
 	node->recv_sock = client_recv_sock;
 	node->send_sock = client_send_sock;
+	node->game_sock = client_game_sock;
 	printf("\nUser logged in: %s", node->username);
 	sprintf(buff, "LOGIN-SUCCESS-%s-%s", msg[1], msg[2]);
 	send(client_recv_sock, buff, SEND_RECV_LEN, 0); // message
@@ -47,7 +48,7 @@ void logout(char **msg, UserNode **current_user)
 	}
 }
 
-void signup(char **msg, UserNode **current_user, int client_send_sock, int client_recv_sock)
+void signup(char **msg, UserNode **current_user, int client_send_sock, int client_recv_sock, int client_game_sock)
 {
 	// add to users tree
 	UserNode *node = searchUser(users, msg[1]);
@@ -63,6 +64,7 @@ void signup(char **msg, UserNode **current_user, int client_send_sock, int clien
 	*current_user = searchUser(users, msg[1]);
 	(*current_user)->recv_sock = client_recv_sock;
 	(*current_user)->send_sock = client_send_sock;
+	(*current_user)->game_sock = client_game_sock;
 
 	// write new account to users file
 	FILE *fp = fopen(ACCOUNTS_PATH, "r+");
