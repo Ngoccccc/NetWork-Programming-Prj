@@ -35,6 +35,7 @@ int level = 1;
 
 
 char *name;
+char *opponent;
 int send_sock = 0, valread;
 int recv_sock = 0;
 int game_sock = 0;
@@ -115,15 +116,15 @@ int main(int argc, const char *argv[])
         puts("Unable to open send thread. Exit.");
         exit(-1);
     }
-    if (pthread_create(&threads[2], NULL, gameMessageReceiver, &client_game_sock) < 0){
-        puts("Unable to open game recv thread. Exit");
-        exit(-1);
-    }
+    // if (pthread_create(&threads[2], NULL, gameMessageReceiver, &client_game_sock) < 0){
+    //     puts("Unable to open game recv thread. Exit");
+    //     exit(-1);
+    // }
 
     // join threads
     pthread_join(threads[0], NULL);
     pthread_join(threads[1], NULL);
-    pthread_join(threads[2], NULL);
+    // pthread_join(threads[2], NULL);
 
     // close sockets
     close(client_send_sock);
@@ -133,31 +134,31 @@ int main(int argc, const char *argv[])
     return 0;
 }
 
-void *gameMessageReceiver(void *game_socket) {
-    int game_sock = *(int *)game_socket;
+// void *gameMessageReceiver(void *game_socket) {
+//     int game_sock = *(int *)game_socket;
 
-    char buff[BUFFSIZE];
-    char *msg[MSG_NUM];
-    int recv_bytes;
+//     char buff[BUFFSIZE];
+//     char *msg[MSG_NUM];
+//     int recv_bytes;
 
-    while ((recv_bytes = recv(game_sock, buff, SEND_RECV_LEN, 0)) > 0) {
-        printf(">> Receive: %s\n", buff);
-        meltMsg(buff, msg);
-        if (strcmp(msg[0], "COMPETITOR") == 0)
-        {
-            rivalPoint = atoi(msg[1]);
-            printf("\nrival score 1: %d\n", rivalPoint);
-        }
-    }
+//     while ((recv_bytes = recv(game_sock, buff, SEND_RECV_LEN, 0)) > 0) {
+//         printf(">> Receive: %s\n", buff);
+//         meltMsg(buff, msg);
+//         if (strcmp(msg[0], "COMPETITOR") == 0)
+//         {
+//             rivalPoint = atoi(msg[1]);
+//             printf("\nrival score 1: %d\n", rivalPoint);
+//         }
+//     }
 
-    if (recv_bytes < 0) {
-        perror("Error occurs in connection");
-    } else {
-        puts("Connection closed");
-    }
+//     if (recv_bytes < 0) {
+//         perror("Error occurs in connection");
+//     } else {
+//         puts("Connection closed");
+//     }
 
-    return NULL;
-}
+//     return NULL;
+// }
 
 //------------------------------------------------------------
 
@@ -219,7 +220,7 @@ void home(int sock)
 void roomLobby(int sock)
 {
     int choice;
-    printf("in room: %d\n", in_room);
+    // printf("in room: %d\n", in_room);
     while (state == IN_ROOM || state == WAITING_RESPONSE)
     {
         if (state == IN_GAME)
@@ -481,6 +482,7 @@ void *recv_handler(void *recv_sock)
         {
             randomNum = atol(msg[1]);
             state = IN_GAME;
+            
             send_sock = current_user->send_sock;
             recv_sock = current_user->recv_sock;
             game_sock = current_user->game_sock;
@@ -494,6 +496,13 @@ void *recv_handler(void *recv_sock)
             attron(COLOR_PAIR(1));
             // Room *room = rooms[current_user->room_id];
             startlevel = my_room->room_level;
+            for (int i=0;i<=1;i++){
+                if (strcmp(current_user->username, my_room->players[i]) != 0){
+                    opponent = my_room->players[i];
+                    break;
+                }
+            }
+
             noecho();
             curs_set(0);
             next = randomNum % 7;
