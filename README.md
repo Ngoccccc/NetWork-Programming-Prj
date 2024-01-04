@@ -2,5 +2,5 @@
 - Git clone this project
 - Change directory to cloned folder
 - Run `make`
-- Run `./server 127.0.0.1`
+- Run `./server`
 - Run `./client 127.0.0.1`
