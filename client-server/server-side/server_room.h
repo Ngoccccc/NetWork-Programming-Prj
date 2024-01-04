@@ -18,4 +18,6 @@ void userExitRoom(char** msg, UserNode** current_user);
 
 void userJoinRoom(char** msg, UserNode** current_user);
 
+void infoLeaderboard(UserNode** current_user);
+
 #endif

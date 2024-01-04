@@ -128,7 +128,7 @@ void toplist()
        char *buffer = malloc(sizeof *buffer * TOPLSITMAXLINELENGTH);
        FILE *f;
        clear();
-       if (!(f = fopen("toplist", "r")))
+       if (!(f = fopen(TOPLIST, "r")))
               printw("\n\n\n    Toplist doesn't exist! Your score has to be higher than 0"
                      " to be added ;)\n");
        else
@@ -149,16 +149,16 @@ void addscore()
        if (!score)
               return;
        FILE *f;
-       if (!(f = fopen("toplist", "r")))
+       if (!(f = fopen(TOPLIST, "r")))
        {
-              if (!(f = fopen("toplist", "w")))
+              if (!(f = fopen(TOPLIST, "w")))
                      exit(1);
               fprintf(f, "NAME          LVL SCORE        \n%-13s %2d  %-14d\n",
                       name, level, score);
               fclose(f);
               return;
        }
-       f = fopen("toplist", "r");
+       f = fopen(TOPLIST, "r");
        int num, added = 0;
        char *buffer = malloc(sizeof *buffer * TOPLSITMAXLINELENGTH);
        FILE *tmp;
@@ -179,8 +179,8 @@ void addscore()
               fprintf(tmp, "%-13s %2d  %-14d\n", name, level, score);
        fclose(f);
        fclose(tmp);
-       remove("toplist");
-       rename("tmp", "toplist");
+       remove(TOPLIST);
+       rename("tmp", TOPLIST);
        free(buffer);
 }
 

@@ -1,12 +1,14 @@
 #ifndef __MESSAGE_H_
 #define __MESSAGE_H_
 
-#define SEND_RECV_LEN 256
-#define BUFFSIZE 256
-#define MSG_NUM 256
+#define SEND_RECV_LEN 3000
+#define BUFFSIZE 3000
+#define MSG_NUM 3000
 
 #define LOGINS "LOGINS" // [from SERVER] require: client(s) to login
 #define LOGINC "LOGINC" // [from CLIENT] inform: client logged in,
+
+#define LEADERBOARD "LEADERBOARD"
 
 #define LOGINFAIL1 "LOGINFAIL1" // [from SERVER] inform: username/password incorrect | not exist
 #define LOGINFAIL2 "LOGINFAIL2" // [from SERVER] inform: client already logged in (status == 1)

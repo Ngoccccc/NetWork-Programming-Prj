@@ -218,6 +218,11 @@ void *connection_handler(void *client_sockets)
 			userJoinRoom(msg, &current_user);
 			continue;
 		}
+		if (strcmp(msg[0], "LEADERBOARD") == 0)
+		{
+			infoLeaderboard(&current_user);
+			continue;
+		}
 		// if(strcmp(msg[0], "TO") == 0){ // experiment
 		// 	UserNode* target_user = searchUser(users, msg[1]);
 		// 	if(target_user == NULL) {

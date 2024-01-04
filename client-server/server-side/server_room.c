@@ -67,6 +67,31 @@ void userExitRoom(char** msg, UserNode** current_user){
 	}
 }
 
+void infoLeaderboard(UserNode** current_user){
+	FILE *fptr;
+    char buffer[50];
+	char temp[2000];
+	char message[2000];
+	char send_msg[2044];
+    // Open a file in read mode
+    fptr = fopen(TOPLIST, "r");
+	strcpy(message, temp);
+	if (fptr == NULL) {
+    	printf("Error opening file: %s\n", TOPLIST);
+	}
+	// printf("\n");
+    while (fgets(buffer, 50, fptr) != NULL){
+		// printf("%s\n", buffer);
+        strcat(message, "-");
+		strcat(message, buffer);
+	}
+	// printf("%s\n", message);
+	sprintf(send_msg, "LEADERBOARD%s", message);
+	// printf("%s\n", send_msg);
+	send((*current_user)->recv_sock, send_msg, sizeof(send_msg), 0);
+    fclose(fptr);
+}
+
 void userJoinRoom(char** msg, UserNode** current_user){
 	char buff[BUFFSIZE];
 	int room_id = atoi(msg[2]);
