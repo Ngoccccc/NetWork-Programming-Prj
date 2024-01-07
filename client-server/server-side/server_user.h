@@ -17,4 +17,7 @@ void logout(char** msg, UserNode** current_user);
 
 void signup(char** msg, UserNode** current_user, int client_send_sock, int client_recv_sock, int client_game_sock);
 
+// void changePassword(char **msg, UserNode **current_user);
+
+// void deleteUser(char **msg, UserNode **current_user);
 #endif

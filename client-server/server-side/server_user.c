@@ -85,3 +85,78 @@ void signup(char **msg, UserNode **current_user, int client_send_sock, int clien
 	sprintf(buff, "SIGNUP-SUCCESS-%s-%s", (*current_user)->username, (*current_user)->password);
 	send((*current_user)->recv_sock, buff, SEND_RECV_LEN, 0);
 }
+
+// void changePassword(char **msg, UserNode **current_user) {
+//     char buff[BUFFSIZE];
+
+//     UserNode *node = searchUser(users, (*current_user)->username);
+
+//     if (strcmp(node->password, msg[2]) != 0) {
+//         send((*current_user)->recv_sock, "CHANGEPASSWORD-FAILED-WRONGPASS", SEND_RECV_LEN, 0);
+//         return;
+//     }
+
+//     strcpy(node->password, msg[3]);
+
+//     // Update password in the users file
+//     FILE *fp = fopen(ACCOUNTS_PATH, "r+");
+//     if (fp == NULL) {
+//         printf("Can't open users records");
+//         send((*current_user)->recv_sock, "CHANGEPASSWORD-FAIL", SEND_RECV_LEN, 0);
+//         return;
+//     }
+
+//     fseek(fp, 0, SEEK_END);
+//     fprintf(fp, "%s %s\n", node->username, node->password);
+//     fclose(fp);
+
+//     printf("\nPassword changed for user: %s\n", node->username);
+
+//     // Send password change ACK
+//     sprintf(buff, "CHANGEPASSWORD-SUCCESS-%s", node->username);
+//     send((*current_user)->recv_sock, buff, SEND_RECV_LEN, 0);
+// }
+
+// void inOrderPrintToFile(UserNode *root, FILE *fp) {
+//     if (root != NULL) {
+//         inOrderPrintToFile(root->left, fp);
+//         fprintf(fp, "%s %s\n", root->username, root->password);
+//         inOrderPrintToFile(root->right, fp);
+//     }
+// }
+
+
+// void deleteUser(char **msg, UserNode **current_user) {
+//     char buff[BUFFSIZE];
+
+//     UserNode *node = searchUser(users, msg[1]);
+
+//     if (node == NULL) {
+//         send((*current_user)->recv_sock, "DELETEUSER-FAILED-NONEXIST", SEND_RECV_LEN, 0);
+//         return;
+//     }
+
+//     // Update users tree
+//     users = deleteUserNode(users, node->username);
+
+//     // Update users file
+//     FILE *fp = fopen(ACCOUNTS_PATH, "w");
+//     if (fp == NULL) {
+//         printf("Can't open users records");
+//         send((*current_user)->recv_sock, "DELETEUSER-FAIL", SEND_RECV_LEN, 0);
+//         return;
+//     }
+
+//     // Re-write the user data excluding the deleted user
+//     inOrderPrintToFile(users, fp);
+//     fclose(fp);
+
+//     printf("\nUser deleted: %s\n", node->username);
+
+//     // Send delete user ACK
+//     sprintf(buff, "DELETEUSER-SUCCESS-%s", node->username);
+//     send((*current_user)->recv_sock, buff, SEND_RECV_LEN, 0);
+
+//     // Clear the current_user
+//     *current_user = NULL;
+// }

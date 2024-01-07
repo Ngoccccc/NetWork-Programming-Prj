@@ -176,6 +176,8 @@ void home(int sock)
             printf("\n1. Tao phong");
             printf("\n2. Tham gia phong");
             printf("\n3. Xem bang xep hang");
+            printf("\n. Doi mat khau");
+            printf("\n. Xoa tai khoan");
             printf("\n4. Thoat");
             printf("\nLua chon cua ban: ");
             scanf("%d%*c", &choice);
