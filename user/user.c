@@ -81,7 +81,49 @@ int updateUserStatus(UserNode *root, char *username, UserStatus status)
   return 1;
 }
 
-void delUserBST(UserNode *root)
+UserNode *deleteUserNode(UserNode *root, char *username)
 {
-  // TODO
+    if (root == NULL)
+        return root;
+
+    // Find the node to be deleted using searchUser
+    UserNode *nodeToDelete = searchUser(root, username);
+
+    if (nodeToDelete == NULL) {
+        // Node with the given username doesn't exist
+        return root;
+    }
+
+    // Perform deletion based on whether the node has children
+    if (nodeToDelete->left == NULL) {
+        // Node has no left child or one child
+        UserNode *temp = nodeToDelete->right;
+        free(nodeToDelete);
+        return temp;
+    } else if (nodeToDelete->right == NULL) {
+        // Node has no right child
+        UserNode *temp = nodeToDelete->left;
+        free(nodeToDelete);
+        return temp;
+    } else {
+        // Node with two children, find the in-order successor
+        UserNode *temp = nodeToDelete->right;
+        while (temp->left != NULL) {
+            temp = temp->left;
+        }
+
+        // Copy the in-order successor's data to this node
+        strcpy(nodeToDelete->username, temp->username);
+        strcpy(nodeToDelete->password, temp->password);
+        nodeToDelete->room_id = temp->room_id;
+        nodeToDelete->status = temp->status;
+
+        // Delete the in-order successor
+        nodeToDelete->right = deleteUserNode(nodeToDelete->right, temp->username);
+
+        return root;
+    }
 }
+
+
+
