@@ -86,36 +86,36 @@ void signup(char **msg, UserNode **current_user, int client_send_sock, int clien
 	send((*current_user)->recv_sock, buff, SEND_RECV_LEN, 0);
 }
 
-// void changePassword(char **msg, UserNode **current_user) {
-//     char buff[BUFFSIZE];
+void changePassword(char **msg, UserNode **current_user) {
+    char buff[BUFFSIZE];
 
-//     UserNode *node = searchUser(users, (*current_user)->username);
+    UserNode *node = searchUser(users, (*current_user)->username);
 
-//     if (strcmp(node->password, msg[2]) != 0) {
-//         send((*current_user)->recv_sock, "CHANGEPASSWORD-FAILED-WRONGPASS", SEND_RECV_LEN, 0);
-//         return;
-//     }
+    if (strcmp(node->password, msg[2]) != 0) {
+        send((*current_user)->recv_sock, "CHANGEPASSWORD-FAILED-WRONGPASS", SEND_RECV_LEN, 0);
+        return;
+    }
 
-//     strcpy(node->password, msg[3]);
+    strcpy(node->password, msg[3]);
 
-//     // Update password in the users file
-//     FILE *fp = fopen(ACCOUNTS_PATH, "r+");
-//     if (fp == NULL) {
-//         printf("Can't open users records");
-//         send((*current_user)->recv_sock, "CHANGEPASSWORD-FAIL", SEND_RECV_LEN, 0);
-//         return;
-//     }
+    // Update password in the users file
+    FILE *fp = fopen(ACCOUNTS_PATH, "r+");
+    if (fp == NULL) {
+        printf("Can't open users records");
+        send((*current_user)->recv_sock, "CHANGEPASSWORD-FAIL", SEND_RECV_LEN, 0);
+        return;
+    }
 
-//     fseek(fp, 0, SEEK_END);
-//     fprintf(fp, "%s %s\n", node->username, node->password);
-//     fclose(fp);
+    fseek(fp, 0, SEEK_END);
+    fprintf(fp, "%s %s\n", node->username, node->password);
+    fclose(fp);
 
-//     printf("\nPassword changed for user: %s\n", node->username);
+    printf("\nPassword changed for user: %s\n", node->username);
 
-//     // Send password change ACK
-//     sprintf(buff, "CHANGEPASSWORD-SUCCESS-%s", node->username);
-//     send((*current_user)->recv_sock, buff, SEND_RECV_LEN, 0);
-// }
+    // Send password change ACK
+    sprintf(buff, "CHANGEPASSWORD-SUCCESS-%s", node->username);
+    send((*current_user)->recv_sock, buff, SEND_RECV_LEN, 0);
+}
 
 // void inOrderPrintToFile(UserNode *root, FILE *fp) {
 //     if (root != NULL) {

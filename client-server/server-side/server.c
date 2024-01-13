@@ -236,21 +236,12 @@ void *connection_handler(void *client_sockets)
 			infoLeaderboard(&current_user);
 			continue;
 		}
-		// if(strcmp(msg[0], "TO") == 0){ // experiment
-		// 	UserNode* target_user = searchUser(users, msg[1]);
-		// 	if(target_user == NULL) {
-		// 		printf("Non existed target");
-		// 		continue;
-		// 	}
-		// 	if(target_user->status == OFFLINE) {
-		// 		printf("target user is offline");
-		// 		continue;
-		// 	}
-		// 	char buff[LEN];
-		// 	sprintf(buff, "FROM-%s-%s", current_user->username, msg[2]);
-		// 	send(target_user->recv_sock, buff, SEND_RECV_LEN, 0);
-		// 	continue; // experiment
-		// }
+		if (strcmp(msg[0], "CHANGEPASSWORD") == 0)
+		{
+			changePassword(msg,  &current_user);
+			continue;
+		}
+		
 		if (strcmp(msg[0], "STARTC") == 0)
 		{
 			printf("> Recv: STARTC");
@@ -395,23 +386,3 @@ void *connection_handler(void *client_sockets)
 
 	return 0;
 }
-
-// void* gameloop_handler(void* args){
-// 	while(1){
-// 		for(int i = 0; i < MAX_ROOM_ALLOWED; i++){
-// 			if(rooms[i] == NULL) continue;
-// 			if(rooms[i]->status == PLAYING){
-// 				if(checkEndGame(rooms[i]->game) != rooms[i]->game->playerNum){
-// 					int pid = rooms[i]->game->turn%(rooms[i]->game->playerNum + 1);
-// 					if(checkWin(rooms[i]->game->p[pid]) == 1){
-// 						rooms[i]->game->turn += 1;
-// 						continue;
-// 					}
-// 					rooms[i]->game->turn += 1;
-// 					UserNode* user = searchUser(users, rooms[i]->game->p[pid].username);
-// 					send(user->recv_sock, ROLL, SEND_RECV_LEN, 0);
-// 				}
-// 			}
-// 		}
-// 	}
-// }

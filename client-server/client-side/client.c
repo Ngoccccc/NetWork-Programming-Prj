@@ -176,9 +176,9 @@ void home(int sock)
             printf("\n1. Tao phong");
             printf("\n2. Tham gia phong");
             printf("\n3. Xem bang xep hang");
-            printf("\n. Doi mat khau");
-            printf("\n. Xoa tai khoan");
-            printf("\n4. Thoat");
+            printf("\n4. Doi mat khau");
+            printf("\n5. Xoa tai khoan");
+            printf("\n6. Thoat");
             printf("\nLua chon cua ban: ");
             scanf("%d%*c", &choice);
             fflush(stdout);
@@ -208,6 +208,13 @@ void home(int sock)
                 requestLeaderboard(sock);
                 break;
             case 4:
+                if(requestChangePassword(sock)){
+                    home(sock);
+                }
+                break;
+            case 5:
+                break;
+            case 6:
                 requestLogout(sock);
                 break;
             default:
@@ -216,7 +223,7 @@ void home(int sock)
             }
         }
 
-    } while (choice != 4);
+    } while (choice != 6);
 }
 
 void roomLobby(int sock)

@@ -61,7 +61,7 @@ int requestSignup(int sock){
                     break;
                 else printf(">> Xac nhan mat khau khong chinh xac. Vui long nhap lai.");
             }
-            snprintf(message, sizeof(message), "SIGNUP-%s", username);
+            snprintf(message, sizeof(message), "SIGNUP-%s-%s", username,password);
             send(sock, message, SEND_RECV_LEN , 0);
             state = WAITING_RESPONSE;
         }
@@ -69,28 +69,29 @@ int requestSignup(int sock){
     return 1;
 }
 
-// int requestChangePassword(int sock) {
-//     char oldPassword[BUFFSIZE];
-//     char newPassword[BUFFSIZE];
-//     char confirmPassword[BUFFSIZE];
-//     char message[BUFFSIZE];
+int requestChangePassword(int sock) {
+    char oldPassword[BUFFSIZE];
+    char newPassword[BUFFSIZE];
+    char confirmPassword[BUFFSIZE];
+    char message[BUFFSIZE];
 
-//     printf("\n----Doi mat khau----");
-//     printf("\n> Mat khau hien tai: "); scanf("%s", oldPassword);
-//     printf("> Mat khau moi: "); scanf("%s", newPassword);
-//     printf("> Xac nhan lai mat khau moi: "); scanf("%s", confirmPassword);
+    printf("\n----Doi mat khau----");
+    printf("\n> Mat khau hien tai: "); scanf("%s", oldPassword);
+    printf("> Mat khau moi: "); scanf("%s", newPassword);
+    printf("> Xac nhan lai mat khau moi: "); scanf("%s", confirmPassword);
 
-//     if (strcmp(newPassword, confirmPassword) != 0) {
-//         printf(">> Xac nhan mat khau moi khong chinh xac. Vui long nhap lai.\n");
-//         return 0;
-//     }
+    if (strcmp(newPassword, confirmPassword) != 0) {
+        printf(">> Xac nhan mat khau moi khong chinh xac. Vui long nhap lai.\n");
+        return 0;
+    }
 
-//     snprintf(message, sizeof(message), "CHANGEPASSWORD-%s", current_user->username);
-//     send(sock, message, SEND_RECV_LEN , 0);
-//     state = WAITING_RESPONSE;
+    snprintf(message, sizeof(message), "CHANGEPASSWORD-%s-%s-%s", oldPassword, newPassword, confirmPassword);
+    send(sock, message, SEND_RECV_LEN , 0);
+    printf(">> Doi mat khau thanh cong\n");
+    state = WAITING_RESPONSE;
 
-//     return 1;
-// }
+    return 1;
+}
 
 // int requestDeleteUser(int sock) {
 //     char username[BUFFSIZE];
