@@ -336,6 +336,16 @@ void *recv_handler(void *recv_sock)
             done_leaderboard = 1;
             continue;
         }
+        if (strcmp(msg[0], "CHANGEPASSWORD") == 0)
+        {
+            if(strcmp(msg[1], "SUCCESS") == 0){
+                puts("\nDoi mat khau thanh cong!!");
+                state = LOGGED_IN;
+                continue;
+            }
+            state = LOGGED_IN;
+            continue;
+        }
         if (strcmp(msg[0], "LOGIN") == 0)
         {
             if (strcmp(msg[1], "SUCCESS") == 0)

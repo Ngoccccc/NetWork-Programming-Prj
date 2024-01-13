@@ -88,7 +88,7 @@ int requestChangePassword(int sock) {
     snprintf(message, sizeof(message), "CHANGEPASSWORD-%s-%s-%s", oldPassword, newPassword, confirmPassword);
     send(sock, message, SEND_RECV_LEN , 0);
     printf(">> Doi mat khau thanh cong\n");
-    state = WAITING_RESPONSE;
+    state = LOGGED_IN;
 
     return 1;
 }
