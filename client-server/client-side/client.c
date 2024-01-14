@@ -56,7 +56,7 @@ void roomLobby(int sock);
 
 void *recv_handler(void *recv_sock);
 void *send_handler(void *send_sock);
-void *gameMessageReceiver(void *game_socket);
+
 //------------------------------------
 
 int main(int argc, const char *argv[])
@@ -117,15 +117,10 @@ int main(int argc, const char *argv[])
         puts("Unable to open send thread. Exit.");
         exit(-1);
     }
-    // if (pthread_create(&threads[2], NULL, gameMessageReceiver, &client_game_sock) < 0){
-    //     puts("Unable to open game recv thread. Exit");
-    //     exit(-1);
-    // }
 
     // join threads
     pthread_join(threads[0], NULL);
     pthread_join(threads[1], NULL);
-    // pthread_join(threads[2], NULL);
 
     // close sockets
     close(client_send_sock);
@@ -135,31 +130,6 @@ int main(int argc, const char *argv[])
     return 0;
 }
 
-// void *gameMessageReceiver(void *game_socket) {
-//     int game_sock = *(int *)game_socket;
-
-//     char buff[BUFFSIZE];
-//     char *msg[MSG_NUM];
-//     int recv_bytes;
-
-//     while ((recv_bytes = recv(game_sock, buff, SEND_RECV_LEN, 0)) > 0) {
-//         printf(">> Receive: %s\n", buff);
-//         meltMsg(buff, msg);
-//         if (strcmp(msg[0], "COMPETITOR") == 0)
-//         {
-//             rivalPoint = atoi(msg[1]);
-//             printf("\nrival score 1: %d\n", rivalPoint);
-//         }
-//     }
-
-//     if (recv_bytes < 0) {
-//         perror("Error occurs in connection");
-//     } else {
-//         puts("Connection closed");
-//     }
-
-//     return NULL;
-// }
 
 //------------------------------------------------------------
 
@@ -182,7 +152,6 @@ void home(int sock)
             printf("\n6. Thoat");
             printf("\nLua chon cua ban: ");
             scanf("%d%*c", &choice);
-            fflush(stdout);
             switch (choice)
             {
             case 1:
@@ -296,12 +265,14 @@ void *send_handler(void *send_sock)
                 if (requestLogin(send_socket))
                 {
                     home(send_socket);
+                    state = NOT_LOGGED_IN;
                 }
                 break;
             case 2:
                 if (requestSignup(send_socket))
                 {
                     home(send_socket);
+                    state = NOT_LOGGED_IN;
                 }
                 break;
             case 3:
@@ -379,6 +350,7 @@ void *recv_handler(void *recv_sock)
         {
             if (strcmp(msg[1], "SUCCESS") == 0)
             {
+                printf("logggout\n");
                 state = NOT_LOGGED_IN;
                 UserNode *node = current_user;
                 free(node);
