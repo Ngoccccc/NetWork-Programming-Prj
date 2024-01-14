@@ -24,11 +24,15 @@ UserNode *login(char **msg, int client_send_sock, int client_recv_sock, int clie
 		send(client_recv_sock, "LOGIN-FAILED-ACTIVE", SEND_RECV_LEN, 0); // message
 		return NULL;
 	}
+	printf("3\n");
 	if (strcmp(node->password, msg[2]) != 0)
 	{
 		send(client_recv_sock, "LOGIN-FAILED-WRONGPASS", SEND_RECV_LEN, 0);
 		return NULL;
 	}
+	printf("4\n");
+	printf("4\n");
+
 	node->status = ONLINE;
 	node->recv_sock = client_recv_sock;
 	node->send_sock = client_send_sock;

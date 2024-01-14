@@ -178,9 +178,7 @@ void home(int sock)
                 requestLeaderboard(sock);
                 break;
             case 4:
-                if(requestChangePassword(sock)){
-                    home(sock);
-                }
+                requestChangePassword(sock);
                 break;
             case 5:
                 break;
@@ -192,7 +190,6 @@ void home(int sock)
                 break;
             }
         }
-
     } while (choice != 6);
 }
 
