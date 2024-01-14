@@ -200,45 +200,52 @@ void toplist()
        getch();
 }
 
-void addscore()
-{
-       // add score to toplist if needed
-       if (!score)
-              return;
-       FILE *f;
-       if (!(f = fopen(TOPLIST, "r")))
-       {
-              if (!(f = fopen(TOPLIST, "w")))
-                     exit(1);
-              fprintf(f, "NAME          LVL SCORE        \n%-13s %2d  %-14d\n",
-                      name, level, score);
-              fclose(f);
-              return;
-       }
-       f = fopen(TOPLIST, "r");
-       int num, added = 0;
-       char *buffer = malloc(sizeof *buffer * TOPLSITMAXLINELENGTH);
-       FILE *tmp;
-       if (!(tmp = fopen("tmp", "a+")))
-              exit(1);
-       int cntr = 21;
-       while (fgets(buffer, TOPLSITMAXLINELENGTH, f) != NULL && --cntr)
-       {
-              num = strtol(buffer + 18, NULL, 10);
-              if (!added && score > num && num != 0)
-              {
-                     fprintf(tmp, "%-13s %2d  %-14d\n", name, level, score);
-                     score = 0;
-              }
-              fputs(buffer, tmp);
-       }
-       if (cntr && score)
-              fprintf(tmp, "%-13s %2d  %-14d\n", name, level, score);
-       fclose(f);
-       fclose(tmp);
-       remove(TOPLIST);
-       rename("tmp", TOPLIST);
-       free(buffer);
+void addscore() {
+    if (!score)
+        return;
+
+    FILE *f, *tmp;
+    if (!(f = fopen(TOPLIST, "r"))) {
+        if (!(f = fopen(TOPLIST, "w")))
+            exit(1);
+
+        fprintf(f, "NAME          LVL SCORE        \n%-13s %2d  %-14d\n",
+                name, level, score);
+        fclose(f);
+        return;
+    }
+
+    int added = 0;
+    char *buffer = malloc(sizeof *buffer * TOPLSITMAXLINELENGTH);
+    if (!(tmp = fopen("tmp", "a+")))
+        exit(1);
+
+    while (fgets(buffer, TOPLSITMAXLINELENGTH, f) != NULL) {
+        char currName[128];
+        int numScore;
+        sscanf(buffer, "%13s %*d %d", currName, &numScore);
+
+        if (strcmp(name, currName) == 0) {
+            // Update score only if it's higher
+            if (score > numScore) {
+                fprintf(tmp, "%-13s %2d  %-14d\n", name, level, score);
+                added = 1;
+            } else {
+                fprintf(tmp, "%-13s %2d  %-14d\n", buffer, level, numScore);
+            }
+        } else {
+            fprintf(tmp, "%-13s %2d  %-14d\n", buffer, level, numScore);
+        }
+    }
+
+    if (!added)
+        fprintf(tmp, "%-13s %2d  %-14d\n", name, level, score);
+
+    fclose(f);
+    fclose(tmp);
+    remove(TOPLIST);
+    rename("tmp", TOPLIST);
+    free(buffer);
 }
 
 int gameover()

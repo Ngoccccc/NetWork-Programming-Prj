@@ -8,6 +8,7 @@
 #include <ncurses.h>
 #include <pthread.h>
 #include <unistd.h>
+#include <semaphore.h>
 // #include "../../gameplay/chessboard.h"
 #include "../util.h"
 #include "../../room/room.h"
@@ -32,7 +33,6 @@ int roll_control = 1;
 int af_roll = 1;
 int in_room = 1;
 int level = 1;
-
 
 char *name;
 char *opponent;
@@ -129,7 +129,6 @@ int main(int argc, const char *argv[])
     return 0;
 }
 
-
 //------------------------------------------------------------
 
 void home(int sock)
@@ -146,7 +145,9 @@ void home(int sock)
             printf("\n1. Tao phong");
             printf("\n2. Tham gia phong");
             printf("\n3. Xem bang xep hang");
-            printf("\n4. Thoat");
+            printf("\n4. Doi mat khau");
+            printf("\n5. Xoa tai khoan");
+            printf("\n6. Thoat");
             printf("\nLua chon cua ban: ");
             scanf("%d%*c", &choice);
             switch (choice)
@@ -175,6 +176,11 @@ void home(int sock)
                 requestLeaderboard(sock);
                 break;
             case 4:
+                requestChangePassword(sock);
+                break;
+            case 5:
+                break;
+            case 6:
                 requestLogout(sock);
                 break;
             default:
@@ -182,8 +188,7 @@ void home(int sock)
                 break;
             }
         }
-
-    } while (choice != 4);
+    } while (choice != 6);
 }
 
 void roomLobby(int sock)
@@ -296,6 +301,17 @@ void *recv_handler(void *recv_sock)
             printLeaderboard(msg);
             state = LOGGED_IN;
             done_leaderboard = 1;
+            continue;
+        }
+        if (strcmp(msg[0], "CHANGEPASSWORD") == 0)
+        {
+            if (strcmp(msg[1], "SUCCESS") == 0)
+            {
+                puts("\nDoi mat khau thanh cong!!");
+                state = LOGGED_IN;
+                continue;
+            }
+            state = LOGGED_IN;
             continue;
         }
         if (strcmp(msg[0], "LOGIN") == 0)
@@ -453,7 +469,7 @@ void *recv_handler(void *recv_sock)
         {
             randomNum = atol(msg[1]);
             state = IN_GAME;
-            
+
             send_sock = current_user->send_sock;
             recv_sock = current_user->recv_sock;
             game_sock = current_user->game_sock;
@@ -467,8 +483,10 @@ void *recv_handler(void *recv_sock)
             attron(COLOR_PAIR(1));
             // Room *room = rooms[current_user->room_id];
             startlevel = my_room->room_level;
-            for (int i=0;i<=1;i++){
-                if (strcmp(current_user->username, my_room->players[i]) != 0){
+            for (int i = 0; i <= 1; i++)
+            {
+                if (strcmp(current_user->username, my_room->players[i]) != 0)
+                {
                     opponent = my_room->players[i];
                     break;
                 }
@@ -480,7 +498,7 @@ void *recv_handler(void *recv_sock)
             // while (!game())
             //     {}
             game();
-            
+
             free(name);
             endwin();
             fflush(stdout);

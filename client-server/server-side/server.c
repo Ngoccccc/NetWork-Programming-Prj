@@ -231,21 +231,12 @@ void *connection_handler(void *client_sockets)
 			infoLeaderboard(&current_user);
 			continue;
 		}
-		// if(strcmp(msg[0], "TO") == 0){ // experiment
-		// 	UserNode* target_user = searchUser(users, msg[1]);
-		// 	if(target_user == NULL) {
-		// 		printf("Non existed target");
-		// 		continue;
-		// 	}
-		// 	if(target_user->status == OFFLINE) {
-		// 		printf("target user is offline");
-		// 		continue;
-		// 	}
-		// 	char buff[LEN];
-		// 	sprintf(buff, "FROM-%s-%s", current_user->username, msg[2]);
-		// 	send(target_user->recv_sock, buff, SEND_RECV_LEN, 0);
-		// 	continue; // experiment
-		// }
+		if (strcmp(msg[0], "CHANGEPASSWORD") == 0)
+		{
+			changePassword(msg, &current_user);
+			continue;
+		}
+
 		if (strcmp(msg[0], "STARTC") == 0)
 		{
 			printf("> Recv: STARTC");

@@ -40,4 +40,5 @@
 
 #define ENDGAME "ENDGAME" // [from SERVER] if only 1 person left when he/she still not won yet.
 
+#define CHANGEPASSWORD "CHANGEPASSWORD"
 #endif

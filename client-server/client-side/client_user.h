@@ -16,4 +16,7 @@ void requestLogout(int sock);
 
 int requestSignup(int sock);
 
+int requestChangePassword(int sock);
+
+// int requestDeleteUser(int sock);
 #endif
