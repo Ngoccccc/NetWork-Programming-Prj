@@ -197,7 +197,7 @@ void *connection_handler(void *client_sockets)
 
 		meltMsg(client_message, msg);
 		if (strcmp(msg[0], "LOGIN") == 0)
-		{ 
+		{
 			current_user = login(msg, client_send_sock, client_recv_sock, client_game_sock);
 			continue;
 		}
@@ -207,17 +207,17 @@ void *connection_handler(void *client_sockets)
 			continue;
 		}
 		if (strcmp(msg[0], "LOGOUT") == 0)
-		{ 
+		{
 			logout(msg, &current_user);
 			continue;
 		}
 		if (strcmp(msg[0], "NEWROOM") == 0)
-		{ 
+		{
 			userCreateRoom(msg, &current_user);
 			continue;
 		}
 		if (strcmp(msg[0], "EXITROOM") == 0)
-		{ 
+		{
 			userExitRoom(msg, &current_user);
 			continue;
 		}
@@ -437,23 +437,3 @@ void *connection_handler(void *client_sockets)
 
 	return 0;
 }
-
-// void* gameloop_handler(void* args){
-// 	while(1){
-// 		for(int i = 0; i < MAX_ROOM_ALLOWED; i++){
-// 			if(rooms[i] == NULL) continue;
-// 			if(rooms[i]->status == PLAYING){
-// 				if(checkEndGame(rooms[i]->game) != rooms[i]->game->playerNum){
-// 					int pid = rooms[i]->game->turn%(rooms[i]->game->playerNum + 1);
-// 					if(checkWin(rooms[i]->game->p[pid]) == 1){
-// 						rooms[i]->game->turn += 1;
-// 						continue;
-// 					}
-// 					rooms[i]->game->turn += 1;
-// 					UserNode* user = searchUser(users, rooms[i]->game->p[pid].username);
-// 					send(user->recv_sock, ROLL, SEND_RECV_LEN, 0);
-// 				}
-// 			}
-// 		}
-// 	}
-// }
