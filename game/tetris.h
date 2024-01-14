@@ -34,6 +34,7 @@ int game();
 // void updateCompetitorScore(int competitorPoint);
 
 void updateCompetitorScore();
+void updateCompetitorStatus();
 
 void setCompetitorPoint(int *point);
 

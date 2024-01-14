@@ -22,9 +22,10 @@ extern int send_sock, valread;
 extern int recv_sock;
 extern int game_sock;
 extern int level;
+bool paused = false;
+bool c_paused = false;
 int *competitorPoint = 0;
 int rp = 0;
-// extern int rivalPoint = 0;
 int score, showtext = 1, shownext = 1, end, clrlines = 0;
 extern int next;
 extern int randomNum;
@@ -154,6 +155,10 @@ void updateCompetitorScore()
               if ((strcmp(msg[0], "COMPETITOR") == 0))
               {
                      rp = atoi(msg[2]);
+              }else if ((strcmp(msg[0], "PAUSE") == 0)){
+                     c_paused = true;
+              }else if ((strcmp(msg[0], "RESUME") == 0)){
+                     c_paused = false;
               }
        }
        // updates Cscore
@@ -161,6 +166,16 @@ void updateCompetitorScore()
        sprintf(tmp, "%-6d", rp);
 
        memcpy(left[10] + 10, tmp, 6);
+       free(tmp);
+
+       tmp = malloc(sizeof *tmp * 15);
+       if (c_paused == false){
+              sprintf(tmp, "%-6d", 0);
+       }else {
+              sprintf(tmp, "%-6d", 1);
+       }
+
+       memcpy(left[8] + 11, tmp, 6);
        free(tmp);
 }
 
@@ -264,7 +279,7 @@ int gameover()
        memcpy(center[16], "    : QUIT    : RESET   \0"
                           "        : TOPLIST       \0",
               WIDTH * 2);
-       center[17][7] = toupper(TPLS);
+       center[17][7] = toupper(PS);
        clear();
        printw("\n");
        for (int i = 2; i < HEIGHT; ++i)
@@ -1458,7 +1473,7 @@ void init()
                        "  LEVEL:                \0"
                        "                        \0"
                        "  SCORE:                \0"
-                       "                        \0"
+                       "  OSTATUS:              \0"
                        "  OPP:                  \0"
                        "  OSCORE:               \0"
                        "                        \0"
@@ -1507,10 +1522,10 @@ void init()
                         "         :ROTATE        \0"
                         "    : DROP              \0"
                         "    : SHOW/HIDE NEXT    \0"
-                        "    : HIDE THIS TEXT    \0"
+                        "    : PAUSE             \0"
                         "                        \0"
-                        "                        \0"
-                        "                        \0"
+                        "    1: Paused           \0"
+                        "    0: Playing          \0"
                         "                        \0"
                         "                        \0"
                         "                        \0"
@@ -1544,7 +1559,7 @@ void setkeybind()
        right[4][8] = toupper(ROTA);
        right[5][3] = toupper(DROP);
        right[6][3] = toupper(SNXT);
-       right[7][3] = toupper(STXT);
+       right[7][3] = toupper(PS);
 }
 
 int game()
@@ -1578,49 +1593,77 @@ int game()
                      send(send_sock, gameover, strlen(gameover), 0);
                      return 1;
               }
-              switch (getch())
+
+              if (!paused)
               {
-              case DROP:
-                     if (movedown())
+                     switch (getch())
+                     {
+                     case DROP:
+                            if (movedown())
+                                   continue;
+                            ++dropped;
+                            updatescrn();
                             continue;
-                     ++dropped;
-                     updatescrn();
-                     continue;
-              case STXT:
-                     if (end)
+                     case STXT:
+                            if (end)
+                                   continue;
+                            showtext = !showtext;
+                            updatescrn();
                             continue;
-                     showtext = !showtext;
-                     updatescrn();
-                     continue;
-              case SNXT:
-                     if (end)
+                     case SNXT:
+                            if (end)
+                                   continue;
+                            shownext = !shownext;
+                            updatescrn();
                             continue;
-                     shownext = !shownext;
-                     updatescrn();
-                     continue;
-              case MOVR:
-                     if (end)
+                     case MOVR:
+                            if (end)
+                                   continue;
+                            moveright();
+                            updatescrn();
                             continue;
-                     moveright();
-                     updatescrn();
-                     continue;
-              case MOVL:
-                     if (end)
+                     case MOVL:
+                            if (end)
+                                   continue;
+                            moveleft();
+                            updatescrn();
                             continue;
-                     moveleft();
-                     updatescrn();
-                     continue;
-              case ROTA:
-                     if (end || fixedpoint[0] < 2)
+                     case ROTA:
+                            if (end || fixedpoint[0] < 2)
+                                   continue;
+                            rotate();
+                            updatescrn();
                             continue;
-                     rotate();
-                     updatescrn();
-                     continue;
-              case TPLS:
-                     if (!end)
-                            continue;
-                     toplist();
+                     case PS:
+                            // if (!end)
+                            //        continue;
+                            // toplist();
+                            paused = true;
+                            char pauseg[128];
+                            snprintf(pauseg, sizeof(pauseg), "PAUSE-%s", name);
+                            send(send_sock, pauseg, strlen(pauseg), 0);
+                            // Additional logic for pause (if needed)
+                            printf("Game Paused\n");
+                            break;
+                     }
               }
+              else
+              {
+                     if (getch() == PS)
+                     {
+                            paused = false;
+                            char resumeg[128];
+                            snprintf(resumeg, sizeof(resumeg), "RESUME-%s", name);
+                            send(send_sock, resumeg, strlen(resumeg), 0);
+                     }
+              }
+
+              if (paused)
+              {
+                     // Skip the game logic if the game is paused
+                     continue;
+              }
+
               if (end)
               {
                      gameover();

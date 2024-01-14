@@ -9,6 +9,7 @@
 #define LOGINC "LOGINC" // [from CLIENT] inform: client logged in,
 
 #define LEADERBOARD "LEADERBOARD"
+#define PAUSE "PAUSE"
 
 #define LOGINFAIL1 "LOGINFAIL1" // [from SERVER] inform: username/password incorrect | not exist
 #define LOGINFAIL2 "LOGINFAIL2" // [from SERVER] inform: client already logged in (status == 1)
