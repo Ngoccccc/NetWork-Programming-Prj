@@ -10,3 +10,4 @@ Thi thoảng server bị đơ (ít khi xảy ra) do hiện tượng `interleaved
 Cập nhật so với checkpoint cuối:
 - Đã có dừng trò chơi (pause) và gửi thông tin về trạng thái dừng/chơi cho người chơi còn lại
 - Cập nhật về cách lưu điểm và hiển thị điểm (leaderboard) theo đúng logic
+- Cập nhật thêm chức năng quản lí tài khoản : đổi mật khẩu .
