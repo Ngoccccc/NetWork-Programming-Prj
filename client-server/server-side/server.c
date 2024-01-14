@@ -35,11 +35,6 @@ void initGlobals();
 
 int main(int argc, const char *args[])
 {
-	if (argc != 2)
-	{
-		printf("\nKhong ro dinh dang. Moi nhap: ./server <server_address>");
-		exit(1);
-	}
 
 	// init globals
 	initGlobals();
@@ -61,7 +56,7 @@ int main(int argc, const char *args[])
 	struct sockaddr_in server_addr;
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_port = htons(9999);
-	server_addr.sin_addr.s_addr = inet_addr(args[1]);
+	server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
 	if (bind(server_socket, (struct sockaddr *)&server_addr, sizeof(server_addr)) != 0)
 	{
