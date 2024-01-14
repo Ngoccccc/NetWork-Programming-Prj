@@ -34,7 +34,6 @@ int af_roll = 1;
 int in_room = 1;
 int level = 1;
 
-
 char *name;
 char *opponent;
 int send_sock = 0, valread;
@@ -129,7 +128,6 @@ int main(int argc, const char *argv[])
 
     return 0;
 }
-
 
 //------------------------------------------------------------
 
@@ -297,7 +295,6 @@ void *recv_handler(void *recv_sock)
     char *msg[MSG_NUM];
     while ((recv_bytes = recv(recv_socket, buff, SEND_RECV_LEN, 0) > 0))
     {
-        printf("> Recv: %s\n", buff);
         meltMsg(buff, msg);
         if (strcmp(msg[0], "LEADERBOARD") == 0)
         {
@@ -308,7 +305,8 @@ void *recv_handler(void *recv_sock)
         }
         if (strcmp(msg[0], "CHANGEPASSWORD") == 0)
         {
-            if(strcmp(msg[1], "SUCCESS") == 0){
+            if (strcmp(msg[1], "SUCCESS") == 0)
+            {
                 puts("\nDoi mat khau thanh cong!!");
                 state = LOGGED_IN;
                 continue;
@@ -471,7 +469,7 @@ void *recv_handler(void *recv_sock)
         {
             randomNum = atol(msg[1]);
             state = IN_GAME;
-            
+
             send_sock = current_user->send_sock;
             recv_sock = current_user->recv_sock;
             game_sock = current_user->game_sock;
@@ -485,8 +483,10 @@ void *recv_handler(void *recv_sock)
             attron(COLOR_PAIR(1));
             // Room *room = rooms[current_user->room_id];
             startlevel = my_room->room_level;
-            for (int i=0;i<=1;i++){
-                if (strcmp(current_user->username, my_room->players[i]) != 0){
+            for (int i = 0; i <= 1; i++)
+            {
+                if (strcmp(current_user->username, my_room->players[i]) != 0)
+                {
                     opponent = my_room->players[i];
                     break;
                 }
@@ -498,7 +498,7 @@ void *recv_handler(void *recv_sock)
             // while (!game())
             //     {}
             game();
-            
+
             free(name);
             endwin();
             fflush(stdout);
