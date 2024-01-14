@@ -8,6 +8,7 @@
 #include <ncurses.h>
 #include <pthread.h>
 #include <unistd.h>
+#include <semaphore.h>
 // #include "../../gameplay/chessboard.h"
 #include "../util.h"
 #include "../../room/room.h"
@@ -328,6 +329,7 @@ void *recv_handler(void *recv_sock)
     char *msg[MSG_NUM];
     while ((recv_bytes = recv(recv_socket, buff, SEND_RECV_LEN, 0) > 0))
     {
+        printf("> Recv: %s\n", buff);
         meltMsg(buff, msg);
         if (strcmp(msg[0], "LEADERBOARD") == 0)
         {
