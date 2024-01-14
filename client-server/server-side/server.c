@@ -300,6 +300,53 @@ void *connection_handler(void *client_sockets)
 			}
 			continue;
 		}
+		if (strcmp(msg[0], "PAUSE") == 0)
+		{
+			UserNode *user = searchUser(users, msg[1]);
+			Room *room = rooms[user->room_id];
+			for (int i = 0; i < room->inroom_no; i++)
+			{
+				if (strcmp(user->username, room->players[i]) == 0)
+				{
+					int point = atoi(msg[2]);
+					room->point[i] = point;
+					printf("User: %s paused\n", room->players[i]);
+				}
+				else
+				{
+					UserNode *user = searchUser(users, room->players[i]);
+					char buff[128];
+					snprintf(buff, sizeof(buff), "PAUSE-%s", msg[1]);
+					send(user->game_sock, buff, SEND_RECV_LEN, 0);
+					printf("\n> Send: %s\n", buff);
+				}
+			}
+			continue;
+		}
+
+		if (strcmp(msg[0], "RESUME") == 0)
+		{
+			UserNode *user = searchUser(users, msg[1]);
+			Room *room = rooms[user->room_id];
+			for (int i = 0; i < room->inroom_no; i++)
+			{
+				if (strcmp(user->username, room->players[i]) == 0)
+				{
+					int point = atoi(msg[2]);
+					room->point[i] = point;
+					printf("User: %s resumed\n", room->players[i]);
+				}
+				else
+				{
+					UserNode *user = searchUser(users, room->players[i]);
+					char buff[128];
+					snprintf(buff, sizeof(buff), "RESUME-%s", msg[1]);
+					send(user->game_sock, buff, SEND_RECV_LEN, 0);
+					printf("\n> Send: %s\n", buff);
+				}
+			}
+			continue;
+		}
 
 		if (strcmp(msg[0], "GAMEOVER") == 0)
 		{

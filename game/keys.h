@@ -7,4 +7,4 @@
 #define SNXT 'z'
 #define STXT 'c'
 #define EXT 'k'
-#define TPLS 't'
+#define PS 'p'
