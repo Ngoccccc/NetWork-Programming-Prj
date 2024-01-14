@@ -95,12 +95,12 @@ void changePassword(char **msg, UserNode **current_user) {
 
     UserNode *node = searchUser(users, (*current_user)->username);
 
-    if (strcmp(node->password, msg[2]) != 0) {
+    if (strcmp(node->password, msg[1]) != 0) {
         send((*current_user)->recv_sock, "CHANGEPASSWORD-FAILED-WRONGPASS", SEND_RECV_LEN, 0);
         return;
     }
 
-    strcpy(node->password, msg[3]);
+    strcpy(node->password, msg[2]);
 
     // Update password in the users file
     FILE *fp = fopen(ACCOUNTS_PATH, "r+");
@@ -110,9 +110,50 @@ void changePassword(char **msg, UserNode **current_user) {
         return;
     }
 
-    fseek(fp, 0, SEEK_END);
-    fprintf(fp, "%s %s\n", node->username, node->password);
+	FILE *temp_fp = fopen("temp_accounts.txt", "w");
+    if (temp_fp == NULL) {
+        printf("Can't create temporary file");
+        fclose(fp);
+        send((*current_user)->recv_sock, "CHANGEPASSWORD-FAIL", SEND_RECV_LEN, 0);
+        return;
+    }
+
+    char line[BUFFSIZE];
+    int accountCount;
+
+    // Read and skip the first line indicating the number of accounts
+    if (fgets(line, sizeof(line), fp) != NULL) {
+        sscanf(line, "%d", &accountCount);
+        fprintf(temp_fp, "%d\n", accountCount);
+    }
+
+    // Process the rest of the file
+    while (fgets(line, sizeof(line), fp)) {
+        char username[BUFFSIZE];
+        char password[BUFFSIZE];
+        if (sscanf(line, "%s %s", username, password) == 2) {
+            if (strcmp(username, node->username) == 0) {
+                fprintf(temp_fp, "%s %s\n", node->username, node->password);
+            } else {
+                fprintf(temp_fp, "%s %s\n", username, password);
+            }
+        }
+    }
+
     fclose(fp);
+    fclose(temp_fp);
+
+    if (remove(ACCOUNTS_PATH) != 0) {
+        printf("Error removing file: %s\n", ACCOUNTS_PATH);
+        send((*current_user)->recv_sock, "CHANGEPASSWORD-FAIL", SEND_RECV_LEN, 0);
+        return;
+    }
+
+    if (rename("temp_accounts.txt", ACCOUNTS_PATH) != 0) {
+        printf("Error renaming file\n");
+        send((*current_user)->recv_sock, "CHANGEPASSWORD-FAIL", SEND_RECV_LEN, 0);
+        return;
+    }
 
     printf("\nPassword changed for user: %s\n", node->username);
 
