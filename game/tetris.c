@@ -313,7 +313,6 @@ void initpiece()
        int current;
        randomNum = randomNum - 5;
        current = next;
-       // current = 3;
 
        if (randomNum == 1)
        {
