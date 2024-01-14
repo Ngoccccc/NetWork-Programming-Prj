@@ -10,6 +10,6 @@ typedef struct {
 } ThrdHandlerArgs;
 
 #define SERVER_PORT 9999
-#define SERVER_ADDR "192.168.56.102"
+#define SERVER_ADDR "127.0.0.1"
 
 #endif
