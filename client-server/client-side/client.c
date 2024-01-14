@@ -489,15 +489,6 @@ void *recv_handler(void *recv_sock)
             continue;
         }
 
-        // if (strcmp(msg[0], "COMPETITOR") == 0)
-        // {
-        //     printf("Nhan diem doi thu la %s\n", msg[1]);
-        //     int competitorScore = atoi(msg[1]);
-        //     rivalPoint = atoi(msg[1]);
-        //     printf("rival score 1: %d\n", rivalPoint);
-        //     continue;
-        // }
-
         if (strcmp(msg[0], "WAITINGRESULT") == 0)
         {
             puts("Vui long doi nguoi choi con lai choi not");
